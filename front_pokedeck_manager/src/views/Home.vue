@@ -1,7 +1,8 @@
 <template>
     <section class="home">
       <searchbar></searchbar>
-      <cards></cards>
+
+      <cards :addPage="true"></cards>
     </section>
 </template>
 
