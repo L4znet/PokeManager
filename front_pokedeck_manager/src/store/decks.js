@@ -1,6 +1,3 @@
-//import axios from 'axios'
-//import router from '../router'
-
 const decks = {
     namespaced: true,
 
@@ -19,7 +16,9 @@ const decks = {
     },
 
     actions:{
-
+        addToDeck(context, payload){
+         console.log(payload.test)
+        },
     },
 
 }
