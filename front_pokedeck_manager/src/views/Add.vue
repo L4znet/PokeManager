@@ -2,10 +2,11 @@
   <section class="adddecks">
     <section>
       <searchbar></searchbar>
-      <cards></cards>
+      <cards :addPage="true"></cards>
     </section>
     <section class="selectedDecks">
-    <emojiselector></emojiselector>
+       <emojiselector></emojiselector>
+      <input type="text" v-model="deckName" @keyup="changeDeckName(deckName)" placeholder="Choisissez un nom pour votre deck">
       <ul>
         <li><i>4</i> Weedle <i class="fas fa-times"></i></li>
       </ul>
@@ -18,11 +19,15 @@
 import Searchbar from '@/components/SearchBar.vue'
 import Cards from '@/components/Cards.vue'
 import emojiselector from '@/components/Emoji_selector.vue'
+import {mapActions} from "vuex";
 export default {
   name: 'Add',
   components: {
     Searchbar,Cards,emojiselector
-  }
+  },
+  methods:{
+    ...mapActions("decks", ["changeDeckName"])
+  },
 }
 </script>
 
@@ -98,6 +103,10 @@ export default {
     padding-left:20px;
     font-size:20px;
     font-weight:300;
+    margin-top:20px;
+  }
+
+  .selectedDecks input{
     margin-top:20px;
   }
 
