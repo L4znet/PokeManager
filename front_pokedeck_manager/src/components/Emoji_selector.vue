@@ -1,59 +1,12 @@
 <template>
 <div class="emoji_selector">
-  <div class="emoji_picker">🐬<span></span></div>
+  <div class="emoji_picker" @click="loadEmojiList">🐬<span></span></div>
 
   <transition name="fade" mode="out-in">
-    <div class="emoji_picker_list">
+    <div class="emoji_picker_list" v-if="getListEmojiState">
       <ul>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
-        <li>fsdfsd</li>
+        <li v-for="(emoji, index) in emojiList" :key="index" @click="selectEmoji()" >{{emoji.char}}</li>
+        <button @click.prevent="refreshEmojiList">Changer la liste</button>
       </ul>
     </div>
   </transition>
@@ -63,20 +16,38 @@
 <script>
 
 
+import {mapActions, mapGetters} from "vuex";
+import emoji from 'emoji.json';
+
 export default {
   name: 'Emoji_Selector',
   components: {
   },
   data(){
     return{
-      cards:{}
+      emojiList:[]
     }
   },
-  mounted() {
-  },
-  computed: {
+  computed:{
+    ...mapGetters("decks", ["getListEmojiState"]),
   },
   methods: {
+    ...mapActions("decks", ["selectEmoji"]),
+    ...mapActions({
+      toggleListEmoji: 'decks/toggleListEmoji',
+      selectEmoji: 'decks/selectEmoji'
+    }),
+
+    loadEmojiList(){
+      this.toggleListEmoji()
+      this.refreshEmojiList()
+    },
+    refreshEmojiList(){
+      this.emojiList = []
+      for (let i = 0; i < 55; i++) {
+        this.emojiList.push(emoji[Math.round(Math.random() * (400 - 1) + 1)]);
+      }
+    }
   },
 }
 </script>
@@ -137,9 +108,9 @@ export default {
   background-color: #FFF;
   position: absolute;
   z-index:9999;
-  top:20px;
+  top:0;
+  right:50px;
   border-radius:40px;
-  display: none;
 }
 
 .emoji_selector .emoji_picker_list ul{
@@ -156,11 +127,35 @@ export default {
   background-color: #ffffff;
   border-radius: 50%;
   margin:10px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size:30px;
 }
 
 .emoji_selector .emoji_picker_list ul li:hover{
   background-color: #ececec;
   cursor: pointer;
+}
+
+.emoji_selector .emoji_picker_list button{
+  width:100%;
+  height:70px;
+  background-color: #FFF;
+  border:none;
+  font-size:20px;
+  position: absolute;
+  bottom:0;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  color:#f53636;
+  border-top:1px solid #e5e5e5;
+}
+
+.emoji_selector .emoji_picker_list button:hover{
+  background-color: #f53636;
+  cursor: pointer;
+  color:#FFF;
 }
 
 </style>

@@ -3537,6 +3537,11 @@
   "resolved" "https://registry.npmjs.org/emoji-regex/-/emoji-regex-8.0.0.tgz"
   "version" "8.0.0"
 
+"emoji.json@^13.1.0":
+  "integrity" "sha512-ibJCYVe3Ilic4euofl0ozWqkmqXXsCuhuOuwhwAoG9qsMizNGI8aa7P4QIKlZ8NLgXx+pnVT2t6ZTvQczIv/ZA=="
+  "resolved" "https://registry.npmjs.org/emoji.json/-/emoji.json-13.1.0.tgz"
+  "version" "13.1.0"
+
 "emojis-list@^2.0.0":
   "integrity" "sha1-TapNnbAPmBmIDHn6RXrlsJof04k="
   "resolved" "https://registry.npmjs.org/emojis-list/-/emojis-list-2.1.0.tgz"

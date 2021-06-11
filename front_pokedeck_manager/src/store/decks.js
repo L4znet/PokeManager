@@ -1,9 +1,11 @@
+
 const decks = {
     namespaced: true,
 
     state(){
         return {
             deckName: '',
+            opened:false
         }
     },
 
@@ -16,6 +18,9 @@ const decks = {
         },
         getDeck(state){
             return state.deck
+        },
+        getListEmojiState(state){
+            return state.opened
         }
     },
     mutations:{
@@ -27,6 +32,9 @@ const decks = {
         },
         UPDATE_DECK(state, payload){
             state.deck = payload
+        },
+        UPDATE_LIST_EMOJI_STATE(state, payload){
+            state.opened = payload
         }
     },
 
@@ -48,6 +56,14 @@ const decks = {
         },
         changeDeckName(context, payload){
             context.commit('UPDATE_DECK_NAME', payload);
+        },
+
+        selectEmoji(context){
+            context.commit('UPDATE_LIST_EMOJI_STATE', false);
+
+        },
+        toggleListEmoji(context){
+            context.commit('UPDATE_LIST_EMOJI_STATE', true);
         }
     },
 
