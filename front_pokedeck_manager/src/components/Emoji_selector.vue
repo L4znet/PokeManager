@@ -1,7 +1,6 @@
 <template>
 <div class="emoji_selector">
   <div class="emoji_picker">🐬<span></span></div>
-  <input type="text" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getCards})" placeholder="Choisissez un nom pour votre deck">
 
   <transition name="fade" mode="out-in">
     <div class="emoji_picker_list">
@@ -100,7 +99,7 @@ export default {
   height:60px;
   border-radius: 50%;
   background-color: #FFF;
-  margin:20px 20px 0 0;
+  margin:85px 20px 0 0;
   display: flex;
   justify-content: center;
   align-items: center;
