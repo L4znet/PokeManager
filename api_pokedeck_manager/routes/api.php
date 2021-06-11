@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DeckController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,3 +16,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::resource('deck', DeckController::class);
+
+

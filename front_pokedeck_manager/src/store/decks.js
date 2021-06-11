@@ -1,3 +1,4 @@
+import axios from "axios";
 
 const decks = {
     namespaced: true,
@@ -5,7 +6,9 @@ const decks = {
     state(){
         return {
             deckName: '',
-            opened:false
+            opened:false,
+            baseUrl:'http://api-partiel.test',
+            selectedEmoji:''
         }
     },
 
@@ -21,7 +24,10 @@ const decks = {
         },
         getListEmojiState(state){
             return state.opened
-        }
+        },
+        getSelectedEmoji(state){
+            return state.selectedEmoji
+        },
     },
     mutations:{
         UPDATE_DECK_NAME(state, payload){
@@ -35,6 +41,9 @@ const decks = {
         },
         UPDATE_LIST_EMOJI_STATE(state, payload){
             state.opened = payload
+        },
+        UPDATE_SELECTED_EMOJI(state, payload){
+            state.selectedEmoji = payload
         }
     },
 
@@ -56,14 +65,41 @@ const decks = {
         },
         changeDeckName(context, payload){
             context.commit('UPDATE_DECK_NAME', payload);
+            context.dispatch('addDeck')
         },
 
-        selectEmoji(context){
+        selectEmoji(context, payload){
+            // String.fromCodePoint(0x1F611)
+
+            // On s'assure d'avoir un code structuré comme on le souhaite, et d'en avoir qu'un seul
+            if(payload.length > 5){
+                payload = payload.match(/(1F[A-Z 0-9]{3})/)[0]
+            }
+
             context.commit('UPDATE_LIST_EMOJI_STATE', false);
+            context.commit('UPDATE_SELECTED_EMOJI', payload);
 
         },
         toggleListEmoji(context){
             context.commit('UPDATE_LIST_EMOJI_STATE', true);
+        },
+
+        async addDeck(context){
+            if(context.getters.getSelectedEmoji != "" && context.getters.getDeckName != ""){
+                const data = {
+                    'deck_name':context.getters.getDeckName,
+                    'deck_emoji':context.getters.getSelectedEmoji
+                };
+
+                const header = {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                }
+
+                await axios.post(context.state.baseUrl + '/pokemanager/deck', data,header)
+            } else {
+              // On lance une erreur
+            }
         }
     },
 

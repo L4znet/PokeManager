@@ -7,5 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Deck extends Model
 {
+    protected $fillable = ['deck_name', 'deck_emoji'];
+
     use HasFactory;
 }

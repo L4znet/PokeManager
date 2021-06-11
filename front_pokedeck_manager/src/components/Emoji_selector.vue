@@ -1,11 +1,11 @@
 <template>
 <div class="emoji_selector">
-  <div class="emoji_picker" @click="loadEmojiList">🐬<span></span></div>
+  <div class="emoji_picker" @click="loadEmojiList">+<span></span></div>
 
   <transition name="fade" mode="out-in">
     <div class="emoji_picker_list" v-if="getListEmojiState">
       <ul>
-        <li v-for="(emoji, index) in emojiList" :key="index" @click="selectEmoji()" >{{emoji.char}}</li>
+        <li v-for="(emoji, index) in emojiList" :key="index" @click="selectEmoji(emoji.codes)" >{{emoji.char}}</li>
         <button @click.prevent="refreshEmojiList">Changer la liste</button>
       </ul>
     </div>
@@ -44,9 +44,13 @@ export default {
     },
     refreshEmojiList(){
       this.emojiList = []
+
+
       for (let i = 0; i < 55; i++) {
         this.emojiList.push(emoji[Math.round(Math.random() * (400 - 1) + 1)]);
       }
+
+      console.log(this.emojiList)
     }
   },
 }

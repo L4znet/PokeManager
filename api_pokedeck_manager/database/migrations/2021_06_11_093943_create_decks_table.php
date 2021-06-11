@@ -15,6 +15,8 @@ class CreateDecksTable extends Migration
     {
         Schema::create('decks', function (Blueprint $table) {
             $table->id();
+            $table->string('deck_name');
+            $table->string('deck_emoji');
             $table->timestamps();
         });
     }
