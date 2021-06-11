@@ -19,7 +19,7 @@ export default {
     width:200px;
     height:270px;
     background-color: #e33441;
-    margin:30px 10px 0 10px;
+    margin:0 10px 40px 10px;
     border-radius:10px;
   }
 

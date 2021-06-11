@@ -1,14 +1,14 @@
 <template>
   <transition name="slide-fade">
+
     <section class="cards" v-if="!getSearchState">
-      <card v-for="(card, index) in getCards" :key="index" :name="card.name" :hp="card.hp" :picture="card.images.small" :type_1="card.types[0]" :type_2="card.types[1]"></card>
-      <div class="pagination">
-        <button :disabled="pendingRequest" @click="loadCards(getPendingRequestState)" :class ="(pendingRequest)?'load_button_disabled':'load_button'">En charger plus</button>
-      </div>
+      <pagination></pagination>
+      <card v-for="(card, index) in getCards" :key="index" :picture="card.images.small" @click="addToDeck({test:addPage})"></card>
+      <pagination></pagination>
     </section>
     <section class="cards" v-else>
       <h2>{{ getSearchResults.length }} résultats pour votre recherche</h2>
-      <card v-for="(card, index) in getSearchResults" :key="index" :name="card.name" :hp="card.hp" :picture="card.images.small" :type_1="card.types[0]" :type_2="card.types[1]"></card>
+      <card v-for="(card, index) in getSearchResults" :key="index" :picture="card.images.small" @click="addToDeck({test:addPage})"></card>
     </section>
   </transition>
 
@@ -17,16 +17,18 @@
 <script>
 
 import Card from '@/components/Card.vue'
+import Pagination from './UI/Pagination.vue'
 import {mapActions, mapGetters, mapState} from 'vuex'
 
 export default {
   name: 'Cards',
   components: {
-    Card
+    Card,Pagination
   },
   data(){
     return{
-      cards:{}
+      cards:{},
+      addPage:String
     }
   },
   mounted() {
@@ -38,6 +40,7 @@ export default {
   },
   methods: {
     ...mapActions("cards", ["loadCards"]),
+    ...mapActions("decks", ["addToDeck"]),
   },
 }
 </script>
@@ -49,7 +52,6 @@ export default {
   display: flex;
   justify-content: space-evenly;
   align-content: space-around;
-  margin-top:30px;
   flex-wrap:wrap;
 }
 
@@ -60,36 +62,5 @@ export default {
   font-size:30px;
 }
 
-.pagination{
-  width:100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.pagination button{
-  width:300px;
-  height:50px;
-  border-radius: 50px;
-  border:none;
-  margin-top:30px;
-  font-size:17px;
-}
-
-.pagination .load_button{
-  background-color: #e33441;
-  color:#FFF;
-}
-
-.pagination .load_button:hover{
-  background-color: #fa4753;
-  cursor: pointer;
-}
-
-.pagination .load_button_disabled{
-  background-color: #a0a0a0;
-  color: #000000;
-  cursor: not-allowed;
-}
 
 </style>
