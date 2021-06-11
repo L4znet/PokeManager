@@ -34,10 +34,6 @@ const cards = {
                 "Rare Ultra",
                 "Uncommon"
             ],
-            totalCardsToLoad:250,
-            cardsToLoad:16,
-            cardsLoadedOnce:false,
-            pendingRequest:false
         }
     },
 
@@ -55,15 +51,6 @@ const cards = {
         },
         getRarities(state){
             return state.rarities
-        },
-        getCardsLoadedOnceState(state){
-            return state.cardsLoadedOnce
-        },
-        getPendingRequestState(state){
-            return state.pendingRequest
-        },
-        getCardsLoadedCount(state){
-            return state.cardsToLoad
         }
     },
     mutations:{
@@ -76,15 +63,6 @@ const cards = {
         UPDATE_SEARCH_STATE(state, payload){
             state.isSearching = payload
         },
-        UPDATE_CARDS_LOADED_ONCE_STATE(state, payload){
-            state.cardsLoadedOnce = payload
-        },
-        UPDATE_CARDS_TO_LOAD(state, payload){
-            state.cardsToLoad = payload
-        },
-        UPDATE_PENDING_REQUEST_STATE(state, payload){
-            state.pendingRequest = payload
-        }
     },
 
     actions:{
@@ -97,14 +75,6 @@ const cards = {
          */
         async loadCards(context){
             const url = "https://api.pokemontcg.io/v2/cards";
-
-
-            // Au premier chargmenet de la page, on charge 16 cartes
-            if(!context.state.cardsLoadedOnce){
-
-                // On empêche l'utilisateur de cliquer sur le bouton "En charger plus"
-                context.commit('UPDATE_PENDING_REQUEST_STATE', true);
-
                 const firebaseResponse = await axios.get(url, {
                     params:{
                         'pageSize':16
@@ -116,36 +86,6 @@ const cards = {
 
                 // On envoi les cartes dans l'HTML
                 context.commit('UPDATE_CARDS', firebaseResponse.data.data);
-
-                // On réactive le bouton après le chargement
-                context.commit('UPDATE_PENDING_REQUEST_STATE', false);
-
-                // A partir de maintenant on permet à l'utilisateur de charger d'autres cartes via le bouton en charger plus
-                context.commit('UPDATE_CARDS_LOADED_ONCE_STATE', true);
-
-            } else {
-                // L'utilisateur a cliqué sur le bouton pour charger plus de cartes
-
-                // On désactive le clique sur le bouton pour l'utilisateur
-                context.commit('UPDATE_PENDING_REQUEST_STATE', true);
-
-                // On ajoute 16 au nombre de cartes chargé actuellement
-                context.commit('UPDATE_CARDS_TO_LOAD', context.getters.getCardsLoadedCount + 16);
-
-                    const firebaseResponse = await axios.get(url, {
-                        params:{
-                            'pageSize':context.getters.getCardsLoadedCount
-                        },
-                        headers: {
-                            'X-Api-Key': 'a866fc6e-69bd-4d6f-8821-cbb658fdca00',
-                        }
-                    })
-
-                    // On envoi les cartes dans l'HTML
-                    context.commit('UPDATE_CARDS', firebaseResponse.data.data);
-
-                context.commit('UPDATE_PENDING_REQUEST_STATE', false);
-            }
          },
 
         /**
