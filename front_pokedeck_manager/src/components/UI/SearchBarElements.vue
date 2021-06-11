@@ -1,6 +1,6 @@
 <template>
   <form action="">
-    <input type="search" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getCards})">
+    <input type="search" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getCards})" placeholder="Recherchez une carte...">
   </form>
 </template>
 
