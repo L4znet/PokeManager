@@ -2,10 +2,12 @@
   <section class="adddecks">
     <section>
       <searchbar></searchbar>
+      <cards></cards>
     </section>
     <section class="selectedDecks">
+    <emojiselector></emojiselector>
       <ul>
-        <li><i>4</i> Magicarpe <i class="fas fa-times"></i></li>
+        <li><i>4</i> Weedle <i class="fas fa-times"></i></li>
       </ul>
     </section>
   </section>
@@ -14,10 +16,12 @@
 <script>
 
 import Searchbar from '@/components/SearchBar.vue'
+import Cards from '@/components/Cards.vue'
+import emojiselector from '@/components/Emoji_selector.vue'
 export default {
   name: 'Add',
   components: {
-    Searchbar
+    Searchbar,Cards,emojiselector
   }
 }
 </script>
@@ -31,12 +35,12 @@ export default {
 
   .adddecks section{
     width:100%;
-    height:100vh;
   }
 
   .selectedDecks{
     display: flex;
     flex-direction: column;
+    align-items: center;
   }
 
   .selectedDecks ul{
@@ -85,4 +89,16 @@ export default {
     color: #e33441;
     cursor: pointer;
   }
+  input{
+    width:730px;
+    height:45px;
+    border-radius:50px;
+    border:2px solid #e33441;
+    outline: none;
+    padding-left:20px;
+    font-size:20px;
+    font-weight:300;
+    margin-top:20px;
+  }
+
 </style>
