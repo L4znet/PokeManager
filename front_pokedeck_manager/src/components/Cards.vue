@@ -3,12 +3,12 @@
 
     <section class="cards" v-if="!getSearchState">
       <pagination></pagination>
-      <card v-for="(card, index) in getCards" :key="index" :picture="card.images.small" @click="addToDeck({test:addPage})"></card>
+      <card v-for="(card, index) in getCards" :key="index" :picture="card.images.small" @click="addToDeck({cardName:card.name, addPage:addPage})"></card>
       <pagination></pagination>
     </section>
     <section class="cards" v-else>
       <h2>{{ getSearchResults.length }} résultats pour votre recherche</h2>
-      <card v-for="(card, index) in getSearchResults" :key="index" :picture="card.images.small" @click="addToDeck({test:addPage})"></card>
+      <card v-for="(card, index) in getSearchResults" :key="index" :picture="card.images.small" @click="addToDeck(addPage)"></card>
     </section>
   </transition>
 
@@ -28,8 +28,10 @@ export default {
   data(){
     return{
       cards:{},
-      addPage:String
     }
+  },
+  props:{
+    addPage:Boolean
   },
   mounted() {
     this.loadCards()
@@ -40,7 +42,7 @@ export default {
   },
   methods: {
     ...mapActions("cards", ["loadCards"]),
-    ...mapActions("decks", ["addToDeck"]),
+    ...mapActions("decks", ["addToDeck"])
   },
 }
 </script>
