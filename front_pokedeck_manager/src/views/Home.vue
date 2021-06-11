@@ -2,7 +2,7 @@
     <section class="home">
       <searchbar></searchbar>
 
-      <cards :addPage="true"></cards>
+      <cards :addPage="false"></cards>
     </section>
 </template>
 
