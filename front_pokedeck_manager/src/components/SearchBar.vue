@@ -1,8 +1,8 @@
 <template>
   <section class="searchbar">
-   <search-bar-elements></search-bar-elements>
+    <search-bar-elements></search-bar-elements>
 
-  <filters></filters>
+    <filters></filters>
   </section>
 </template>
 
@@ -18,3 +18,10 @@ export default {
   }
 }
 </script>
+
+<style>
+.searchbar{
+  display: flex;
+  flex-direction: column;
+}
+</style>

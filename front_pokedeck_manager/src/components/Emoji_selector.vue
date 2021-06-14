@@ -1,11 +1,11 @@
 <template>
 <div class="emoji_selector">
-  <div class="emoji_picker" @click="loadEmojiList">+<span></span></div>
+  <div class="emoji_picker" @click="loadEmojiList">{{getSelectedEmoji ? String.fromCodePoint('0x' + getSelectedEmoji): '+'}}<span></span></div>
 
   <transition name="fade" mode="out-in">
     <div class="emoji_picker_list" v-if="getListEmojiState">
       <ul>
-        <li v-for="(emoji, index) in emojiList" :key="index" @click="selectEmoji(emoji.codes)" >{{emoji.char}}</li>
+        <li v-for="(emoji, index) in emojiList" :key="index" @click="selectEmoji(emoji.codes)">{{emoji.char}}</li>
         <button @click.prevent="refreshEmojiList">Changer la liste</button>
       </ul>
     </div>
@@ -29,7 +29,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters("decks", ["getListEmojiState"]),
+    ...mapGetters("decks", ["getListEmojiState", "getSelectedEmoji"]),
   },
   methods: {
     ...mapActions("decks", ["selectEmoji"]),
@@ -61,11 +61,11 @@ export default {
 
 .emoji_selector{
   display: flex;
-  width:100%;
+  width:200px;
   justify-content: center;
   align-items: center;
   position: relative;
-  margin-top:20px;
+  margin:30px 0 0 30px;
 }
 
 .emoji_selector .emoji_picker{
@@ -74,7 +74,6 @@ export default {
   height:60px;
   border-radius: 50%;
   background-color: #FFF;
-  margin:85px 20px 0 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -83,6 +82,7 @@ export default {
   z-index:9996;
   left:0;
   font-size:40px;
+  color: #aeaeae;
 }
 
 .emoji_selector .emoji_picker:hover span{

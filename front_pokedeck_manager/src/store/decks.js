@@ -1,4 +1,5 @@
 import axios from "axios";
+import router from '@/router'
 
 const decks = {
     namespaced: true,
@@ -8,7 +9,10 @@ const decks = {
             deckName: '',
             opened:false,
             baseUrl:'http://api-partiel.test',
-            selectedEmoji:''
+            selectedEmoji:'',
+            cardQuantity:0,
+            decks:[],
+            editingDeck:false
         }
     },
 
@@ -28,6 +32,12 @@ const decks = {
         getSelectedEmoji(state){
             return state.selectedEmoji
         },
+        getDecks(state){
+            return state.decks
+        },
+        getEditDeckState(state){
+            return state.editingDeck
+        }
     },
     mutations:{
         UPDATE_DECK_NAME(state, payload){
@@ -44,23 +54,32 @@ const decks = {
         },
         UPDATE_SELECTED_EMOJI(state, payload){
             state.selectedEmoji = payload
+        },
+        UPDATE_DECKS(state, payload){
+            state.decks = payload
+        },
+        UPDATE_EDIT_DECK_STATE(state, payload){
+            state.editingDeck = payload
         }
     },
 
     actions:{
         addToDeck(context, payload){
-            if(payload){ // Si true on est sur la page de création / modification
+            console.log(payload)
 
-                const card = {
-                    cardName:payload.name,
-                    cardQuantity:1
+            if(payload.addPage){ // Si true on est sur la page de création / modification
+
+                // On ajoute pas plus de 4 cartes identiques.
+                if(context.state.cardQuantity < 4){
+                    context.commit('UPDATE_CARD_QUANTITY', context.state.cardQuantity += 1);
                 }
 
-                console.log(context.getters.getDeck)
+                const card = {
+                    cardName:payload.cardName,
+                    cardQuantity:context.state.cardQuantity
+                }
 
-                context.commit('UPDATE_DECK', context.getters.getDeck + card);
-            } else { // On est sur la home donc on ne doit pas gérer le clique
-
+                console.log(card)
             }
         },
         changeDeckName(context, payload){
@@ -69,8 +88,6 @@ const decks = {
         },
 
         selectEmoji(context, payload){
-            // String.fromCodePoint(0x1F611)
-
             // On s'assure d'avoir un code structuré comme on le souhaite, et d'en avoir qu'un seul
             if(payload.length > 5){
                 payload = payload.match(/(1F[A-Z 0-9]{3})/)[0]
@@ -99,6 +116,17 @@ const decks = {
                 await axios.post(context.state.baseUrl + '/pokemanager/deck', data,header)
             } else {
               // On lance une erreur
+            }
+        },
+        async getAllDecks(context){
+            const decks = await axios.get(context.state.baseUrl + '/pokemanager/deck')
+            context.commit('UPDATE_DECKS', decks.data);
+        },
+        switchToEdit(context){
+            if(router.currentRoute._value.params.id === undefined){
+                context.commit('UPDATE_EDIT_DECK_STATE', false);
+            } else {
+                context.commit('UPDATE_EDIT_DECK_STATE', true);
             }
         }
     },

@@ -1,15 +1,15 @@
 <template>
-  <card></card>
+  <decks></decks>
 </template>
 
 <script>
 
-import Card from '@/components/Card.vue'
+import decks from "@/components/Decks.vue";
 
 export default {
   name: 'MyDecks',
   components: {
-    Card
+    decks,
   }
 }
 </script>
