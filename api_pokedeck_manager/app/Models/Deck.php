@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Deck extends Model
 {
+    use HasFactory;
     protected $fillable = ['deck_name', 'deck_emoji'];
 
-    use HasFactory;
+    public function cards(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Card::class);
+    }
 }

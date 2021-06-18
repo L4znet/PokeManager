@@ -1,5 +1,5 @@
 import axios from 'axios'
-//import router from '../router'
+import router from '@/router'
 
 const cards = {
     namespaced: true,
@@ -9,6 +9,7 @@ const cards = {
             cards: {},
             results:{},
             isSearching:false,
+            baseUrl:'http://api-partiel.test',
             rarities: [
                 "Amazing Rare",
                 "Common",
@@ -34,6 +35,8 @@ const cards = {
                 "Rare Ultra",
                 "Uncommon"
             ],
+            cardCountClickArray:[],
+            selectedCards:[]
         }
     },
 
@@ -42,7 +45,6 @@ const cards = {
         getCards(state){
             return state.cards
         },
-
         getSearchResults(state){
             return state.results
         },
@@ -51,6 +53,12 @@ const cards = {
         },
         getRarities(state){
             return state.rarities
+        },
+        getCardCountClickArray(state){
+            return state.cardCountClickArray
+        },
+        getSelectedCards(state){
+            return state.selectedCards
         }
     },
     mutations:{
@@ -63,6 +71,12 @@ const cards = {
         UPDATE_SEARCH_STATE(state, payload){
             state.isSearching = payload
         },
+        UPDATE_CARD_COUNT_CLICK_ARRAY(state, payload){
+            state.cardCountClickArray = payload
+        },
+        UPDATE_SELECTED_CARDS(state, payload){
+            state.selectedCards = payload
+        }
     },
 
     actions:{
@@ -123,6 +137,55 @@ const cards = {
                 context.commit('UPDATE_SEARCH_STATE', false);
             }
         },
+
+
+
+        async addToDeck(context, payload){
+            if(payload.addPage) { // Si true on est sur la page de création / modification
+                if(context.getters.getCardCountClickArray.length === 0){
+                    let clickCount = context.getters.getCardCountClickArray;
+
+                    clickCount.push({
+                        'id': payload.cardId,
+                        'quantity':1
+                    })
+                    context.commit('UPDATE_CARD_COUNT_CLICK_ARRAY', clickCount);
+                } else {
+                    let clickCount = context.getters.getCardCountClickArray;
+                    if(clickCount.find(card => card.id === payload.cardId)){
+                        let cardToChange = clickCount.find(card => card.id === payload.cardId);
+                        if(cardToChange.quantity <= 3){
+                            cardToChange.quantity++
+
+                            const header = {
+                                'Access-Control-Allow-Origin': '*',
+                                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                            }
+
+                            await axios.post(context.state.baseUrl + '/pokemanager/card', {
+                                id:payload.cardId,
+                                deck_id:router.currentRoute._value.params.id,
+                                card_name:payload.cardName
+                            },header)
+                        }
+                    }
+                }
+            }
+        },
+
+        async loadSelectedCard(context){
+
+            const selectedCards = await axios.get(context.state.baseUrl + '/pokemanager/deck/' + router.currentRoute._value.params.id)
+
+            console.log(selectedCards.data)
+
+            context.commit('UPDATE_SELECTED_CARDS', selectedCards.data);
+
+        }
+
+
+
+
     },
 
 }

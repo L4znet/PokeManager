@@ -1,5 +1,5 @@
 import axios from "axios";
-import router from '@/router'
+import router from "../router";
 
 const decks = {
     namespaced: true,
@@ -10,18 +10,14 @@ const decks = {
             opened:false,
             baseUrl:'http://api-partiel.test',
             selectedEmoji:'',
-            cardQuantity:0,
             decks:[],
-            editingDeck:false
+            editingDeck:false,
         }
     },
 
     getters:{
         getDeckName(state){
             return state.deckName
-        },
-        getQuantityCard(state){
-            return state.cardQuantity
         },
         getDeck(state){
             return state.deck
@@ -37,14 +33,12 @@ const decks = {
         },
         getEditDeckState(state){
             return state.editingDeck
-        }
+        },
+
     },
     mutations:{
         UPDATE_DECK_NAME(state, payload){
             state.deckName = payload
-        },
-        UPDATE_CARD_QUANTITY(state, payload){
-            state.cardQuantity = payload
         },
         UPDATE_DECK(state, payload){
             state.deck = payload
@@ -60,31 +54,16 @@ const decks = {
         },
         UPDATE_EDIT_DECK_STATE(state, payload){
             state.editingDeck = payload
-        }
+        },
+
     },
 
     actions:{
-        addToDeck(context, payload){
-            console.log(payload)
-
-            if(payload.addPage){ // Si true on est sur la page de création / modification
-
-                // On ajoute pas plus de 4 cartes identiques.
-                if(context.state.cardQuantity < 4){
-                    context.commit('UPDATE_CARD_QUANTITY', context.state.cardQuantity += 1);
-                }
-
-                const card = {
-                    cardName:payload.cardName,
-                    cardQuantity:context.state.cardQuantity
-                }
-
-                console.log(card)
-            }
-        },
         changeDeckName(context, payload){
             context.commit('UPDATE_DECK_NAME', payload);
-            context.dispatch('addDeck')
+            if(context.getters.getSelectedEmoji !== ""){
+                context.dispatch('addDeck')
+            }
         },
 
         selectEmoji(context, payload){
@@ -92,10 +71,12 @@ const decks = {
             if(payload.length > 5){
                 payload = payload.match(/(1F[A-Z 0-9]{3})/)[0]
             }
-
             context.commit('UPDATE_LIST_EMOJI_STATE', false);
             context.commit('UPDATE_SELECTED_EMOJI', payload);
 
+            if(context.getters.getDeckName !== ""){
+                context.dispatch('addDeck')
+            }
         },
         toggleListEmoji(context){
             context.commit('UPDATE_LIST_EMOJI_STATE', true);

@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\DeckResource;
 use App\Models\Deck;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -20,19 +18,8 @@ class DeckController extends Controller
      */
     public function index()
     {
-        return DeckResource::collection(Deck::all());
+        return DeckResource::collection(Deck::paginate(10));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create(Request $request): Response
-    {
-        return  Deck::create($request->input());
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -53,11 +40,11 @@ class DeckController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
-        //
+        return response()->json(Deck::find($id)->cards);
     }
 
     /**

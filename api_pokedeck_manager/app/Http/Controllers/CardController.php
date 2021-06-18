@@ -11,23 +11,29 @@ class CardController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return CardResource
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index($id_deck)
     {
-        return new CardResource(Card::where('id_deck', $id_deck)->get());
+        return CardResource::collection(Card::paginate(10));
     }
-
-
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'id' => 'required',
+            'deck_id' => 'required|integer|exists:decks,id',
+            'card_name' => 'required',
+        ]);
+
+        return response()->json(Card::updateOrCreate(
+            ['id' => $data['id'], 'deck_id' => $data['deck_id']],
+            ['card_name' => $data['card_name']])->increment('card_quantity'));
     }
 
     /**

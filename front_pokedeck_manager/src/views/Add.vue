@@ -5,13 +5,13 @@
         <searchbar></searchbar>
         <cards :addPage="true"></cards>
       </section>
-      <section class="side">
-        <ul class="addedCard" v-if="cardAdded">
-          <li></li>
-          <li></li>
-          <li></li>
+      <section class="side"  v-if="cardAdded">
+        <ul class="addedCard" v-for="(selectedCard, index) in getSelectedCards" :key="index">
+          <li><b>{{ selectedCard.card_quantity }}</b><span>{{ selectedCard.card_name }}</span></li>
         </ul>
-        <p v-else>Pas de carte ajoutée au deck pour le moment...</p>
+      </section>
+      <section class="side" v-else>
+       <h1>sdffsdsfd</h1>
       </section>
     </section>
     <section class="selectedDecks" v-else>
@@ -44,11 +44,14 @@ export default {
   mounted() {
     this.switchToEdit()
   },
+
   computed:{
-    ...mapGetters("decks", ["getEditDeckState"])
+    ...mapGetters("decks", ["getEditDeckState"]),
+    ...mapGetters("cards", ["getSelectedCards"]),
   },
   methods:{
-    ...mapActions("decks", ["changeDeckName", "switchToEdit"])
+    ...mapActions("decks", ["changeDeckName", "switchToEdit"]),
+    ...mapActions("cards", ["loadSelectedCard"])
   },
 }
 </script>
@@ -86,6 +89,41 @@ export default {
     list-style: none;
     margin-top:40px;
     border-radius:20px;
+    position: relative;
+    transition:all 0.3s;
+  }
+
+  .addecks section .side .addedCard li{
+    content:'Supprimer cette carte';
+    width:90%;
+    height:80px;
+    background-color: #FFF;
+    list-style: none;
+    margin-top:40px;
+    border-radius:20px;
+    position: relative;
+    transition:all 0.3s;
+    cursor: pointer;
+  }
+
+  .addecks section .side .addedCard li:hover:before{
+    content:'Supprimer cette carte';
+    width:100%;
+    height:80px;
+    background-color: #ff2d2d;
+    list-style: none;
+    border-radius:20px;
+    position: absolute;
+    transition:all 0.3s;
+    cursor: pointer;
+    opacity: 0.5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size:20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color:#FFF;
   }
 
   .addecks section .side p{

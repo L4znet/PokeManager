@@ -16,7 +16,7 @@ class CardResource extends JsonResource
     {
      return [
          'id' => $this->id,
-         'id_deck' => $this->id_deck,
+         'deck_id' => $this->deck_id,
          'card_name' => $this->card_name,
          'card_quantity' => $this->card_quantity
      ];
