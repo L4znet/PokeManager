@@ -2,27 +2,25 @@
 <nav>
 <ul>
   <li>
-    <select v-model="filterValue" @change="filterBy(filterValue)">
+    <select v-model="filterValue" @change="filterBy({filterValue:filterValue, filterType:'types'})">
       <option selected disabled>
         Types
       </option>
+      <option v-for="(type, index) in getTypes" :value="type" :key="index">{{type}}</option>
     </select>
 
   </li>
   <li>
-    <select v-model="filterValue" @change="filterBy({cards:getCards, filterValue:filterValue})">
+    <select v-model="filterValue" @change="filterBy({filterValue:filterValue, filterType:'rarity'})">
       <option selected disabled>
         Rareté
-      </option>
-      <option value="57">
-        VALEUR DE TEST
       </option>
       <option v-for="(rarity, index) in getRarities" :value="rarity" :key="index">{{rarity}}</option>
     </select>
   </li>
   <li>
 
-    <select v-model="filterValue" @change="filterBy(filterValue)">
+    <select v-model="filterValue" @change="filterBy({filterValue:filterValue, filterType:'set'})">
       <option selected disabled>
         Collection
       </option>
@@ -41,7 +39,7 @@ export default {
     ...mapActions("cards", ["filterBy"])
   },
   computed:{
-    ...mapGetters("cards", ["getRarities", "getCards"])
+    ...mapGetters("cards", ["getRarities", "getAllCards", "getTypes"])
   }
 }
 

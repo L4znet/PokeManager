@@ -36,6 +36,19 @@ const cards = {
                 "Rare Ultra",
                 "Uncommon"
             ],
+            types:[
+                "Colorless",
+                "Darkness",
+                "Dragon",
+                "Fairy",
+                "Fighting",
+                "Fire",
+                "Grass",
+                "Lightning",
+                "Metal",
+                "Psychic",
+                "Water"
+            ],
             cardCountClickArray: [],
             selectedCards: [],
             paginationButtonLocked: {'left':{locked:true}, 'right':{locked:false}},
@@ -60,6 +73,9 @@ const cards = {
         },
         getRarities(state){
             return state.rarities
+        },
+        getTypes(state){
+            return state.types
         },
         getCardCountClickArray(state){
             return state.cardCountClickArray
@@ -156,6 +172,7 @@ const cards = {
                  context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:true}});
              } else {
                  // Sinon on incrémente
+                 context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:false}});
                  context.dispatch('displayCardsChunk', {arraySize:23, chunkIndex:context.state.pageNumber})
              }
          }
@@ -221,9 +238,40 @@ const cards = {
          * @param payload
          */
         filterBy(context, payload){
-            let results = payload.cards.filter(item => {
-                return item.rarity.includes(payload.filterValue);
-            }, payload.filterValue);
+
+            let results = []
+            let results2 = []
+
+            console.log()
+
+            switch (payload.filterType){
+                case "rarity":
+                    results = []
+                    for (let i = 0; i < context.getters.getAllCards.length; i++) {
+                        if(context.getters.getAllCards[i].rarity === payload.filterValue){
+                            results.push(context.getters.getAllCards[i])
+                        }
+                    }
+                    break;
+                case "types":
+                    results = []
+                    for (let i = 0; i < context.getters.getAllCards.length; i++) {
+                        if(context.getters.getAllCards[i].types[0] === payload.filterValue){
+                         results2.push(context.getters.getAllCards[i])
+                        }
+                    }
+                    break;
+                case "set":
+
+                    break;
+
+            }
+
+
+            console.log('fsdsfdsfd', results2)
+
+
+
             context.commit('UPDATE_SEARCH_STATE', true);
             context.commit('UPDATE_RESULTS', results);
 
