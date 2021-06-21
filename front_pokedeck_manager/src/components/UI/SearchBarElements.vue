@@ -1,6 +1,6 @@
 <template>
   <form action="">
-    <input type="search" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getCards})" placeholder="Recherchez une carte...">
+    <input type="search" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getAllCards})" placeholder="Recherchez une carte...">
   </form>
 </template>
 
@@ -18,7 +18,7 @@ export default {
     ...mapActions("cards", ["searchValue"])
   },
   computed: {
-    ...mapGetters("cards", ["getCards"])
+    ...mapGetters("cards", ["getAllCards"])
   },
 }
 </script>

@@ -44,10 +44,11 @@ const cards = {
     },
 
     getters:{
-        // Contient toutes les cartes chargé sur la page
+        // Sert à get toutes les cartes chargé sur la page
         getCardsToDisplay(state){
             return state.cardsToDisplay
         },
+        // Sert à get toutes les cartes (pas divisé)
         getAllCards(state){
             return state.allCards
         },
@@ -66,6 +67,8 @@ const cards = {
         getSelectedCards(state){
             return state.selectedCards
         },
+
+        // Sert à get l'état des boutons de pagination
         getPaginationButtonLockedState(state){
             return state.paginationButtonLocked;
         },
@@ -110,42 +113,70 @@ const cards = {
          */
         async loadCards(context){
             const url = "https://api.pokemontcg.io/v2/";
+
+                // On charge les cartes "normale"
                 const cards = await axios.get(url + 'cards', {
                     headers: {
                         'X-Api-Key': 'a866fc6e-69bd-4d6f-8821-cbb658fdca00',
                     }
                 })
-
+                // On charge les cartes "énergies"
                 const energyCards = await axios.get(url + 'cards?q=supertype:energy', {
                     headers: {
                         'X-Api-Key': 'a866fc6e-69bd-4d6f-8821-cbb658fdca00',
                     }
                 })
+
+                // On les rassemble toutes dans un seul tableau
                 let allCards = cards.data.data.concat(energyCards.data.data)
+
+                // Et on mets à jour le state correspondant
                 context.commit('UPDATE_ALL_CARDS_STATE',allCards);
+
+                // On passe ensuite le relais à notre méthode de division / affichage des données
                 context.dispatch('displayCardsChunk', {arraySize:23, chunkIndex:0})
 
          },
 
+        /**
+         * Action qui sert à incrémenter le numéro de page
+         *
+         * @param context
+         */
         incrementPageNumber(context){
+            // On vérifie que le bouton d'incrémentation (droite) n'est pas verrouillé, si c'est le cas on ne fait rien
          if(!context.getters.getPaginationButtonLockedState.right.locked){
+
+             // On incrémente le numéro de page à chaque fois que l'action est lancée
              context.commit('UPDATE_PAGE_NUMBER', context.state.pageNumber + 1)
 
+             // Si le numéro de page est égale au nomre de page total, on affiche la dernière page et on verouille
              if(context.getters.getPageNumber === 21){
                  context.dispatch('displayCardsChunk', {arraySize:23, chunkIndex:21})
                  context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:true}});
              } else {
+                 // Sinon on incrémente
                  context.dispatch('displayCardsChunk', {arraySize:23, chunkIndex:context.state.pageNumber})
-                 context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:false}});
              }
          }
         },
 
+        /**
+         * Action qui sert à décémenter le numéro de page
+         *
+         * @param context
+         */
         decrementPageNumber(context){
+
+            // On vérifie que le bouton de décrémentation (gauche) n'est pas verrouillé, si c'est le cas on ne fait rien
             if(!context.getters.getPaginationButtonLockedState.left.locked){
+
+                // Si on commencé à décrémenter et que le bouton de droite (incrémentation) est verouillé, on le déverouille
                 if(context.getters.getPaginationButtonLockedState.right.locked){
                     context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:false}});
                 }
+
+                // Tant que le numéro de page courant est supérieur à 1, on décremente, quand il est égale à 1 on affiche la première page et on verouille.
                 if(context.getters.getPageNumber > 1){
                     context.commit('UPDATE_PAGE_NUMBER', context.getters.getPageNumber - 1);
 
@@ -167,12 +198,17 @@ const cards = {
          * @param payload
          */
         searchValue(context, payload){
+
+            // On filtre avec le searchTerm
             let results = payload.cards.filter(item => {
                 return item.name.includes(payload.searchTerm);
             }, payload.searchTerm);
+
+            // On active le mode recherche et on envoi les résultats dans le front
             context.commit('UPDATE_SEARCH_STATE', true);
             context.commit('UPDATE_RESULTS', results);
 
+            // Si le searchTerm est vide, on arrête le mode "Recherche"
             if(payload.searchTerm === ""){
                 context.commit('UPDATE_SEARCH_STATE', false);
             }
@@ -234,32 +270,28 @@ const cards = {
         async loadSelectedCard(context){
             const selectedCards = await axios.get(context.state.baseUrl + '/pokemanager/deck/' + router.currentRoute._value.params.id)
 
-            console.log(selectedCards.data)
-
             context.commit('UPDATE_SELECTED_CARDS', selectedCards.data);
         },
 
+        /**
+         * Action qui va diviser toutes les cartes chargé en petit groupe et va les envoyer vers le front
+         *
+         * @param context
+         * @param payload
+         */
         displayCardsChunk(context, payload){
             let smallerArrays = [];
             const arraySize = payload.arraySize;
             let cards = context.getters.getAllCards
 
+            // On divise en petit groupe
             for (var i=0;i<Math.ceil(cards.length/arraySize);i++) {
                 smallerArrays.push(cards.slice(i*arraySize,i*arraySize+arraySize));
             }
 
             context.commit('UPDATE_CARDS_TO_DISPLAY', smallerArrays[payload.chunkIndex]);
-
-            // On divise
-
-console.log(smallerArrays)
-
             // On envoi les cartes dans l'HTML
-
         }
-
-
-
     },
 
 }
