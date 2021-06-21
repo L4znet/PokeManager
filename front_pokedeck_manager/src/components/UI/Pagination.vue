@@ -1,8 +1,7 @@
 <template>
    <section class="pagination">
-     <button @click.prevent="decrementPageNumber(pageNumber--)" :class="[getPaginationButtonLockedState.left.locked ? locked : notLocked]"><i class="fas fa-chevron-left"></i></button>
-     <button @click.prevent="incrementPageNumber(pageNumber++)" :class="[getPaginationButtonLockedState.right.locked ? locked : notLocked]">
-       {{pageNumber}}</button>
+     <button @click.prevent="decrementPageNumber()" :class="[getPaginationButtonLockedState.left.locked ? locked : notLocked]"><i class="fas fa-chevron-left"></i></button>
+     <button @click.prevent="incrementPageNumber()" :class="[getPaginationButtonLockedState.right.locked ? locked : notLocked]"><i class="fas fa-chevron-right"></i></button>
    </section>
 </template>
 
@@ -17,13 +16,10 @@ export default {
     return {
       notLocked: 'pagination_unlocked',
       locked: 'pagination_locked',
-      pageNumber:1
     }
   },
-  mounted() {
-  },
   computed: {
-    ...mapGetters("cards", ["getPaginationButtonLockedState"])
+    ...mapGetters("cards", ["getPaginationButtonLockedState"]),
   },
   methods: {
     ...mapActions("cards", ["incrementPageNumber", "decrementPageNumber"]),

@@ -31,7 +31,7 @@ class CardController extends Controller
             'card_name' => 'required',
         ]);
 
-        return response()->json(Card::updateOrCreate(
+        return response()->json(Card::updatCreate(
             ['id' => $data['id'], 'deck_id' => $data['deck_id']],
             ['card_name' => $data['card_name']])->increment('card_quantity'));
     }

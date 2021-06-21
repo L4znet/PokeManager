@@ -6,7 +6,8 @@ const cards = {
 
     state(){
         return {
-            cards: {},
+            cardsToDisplay: {},
+            allCards:{},
             results: {},
             isSearching: false,
             baseUrl: 'http://api-partiel.test',
@@ -38,14 +39,17 @@ const cards = {
             cardCountClickArray: [],
             selectedCards: [],
             paginationButtonLocked: {'left':{locked:true}, 'right':{locked:false}},
-            pageNumber:1
+            pageNumber:0,
         }
     },
 
     getters:{
         // Contient toutes les cartes chargé sur la page
-        getCards(state){
-            return state.cards
+        getCardsToDisplay(state){
+            return state.cardsToDisplay
+        },
+        getAllCards(state){
+            return state.allCards
         },
         getSearchResults(state){
             return state.results
@@ -67,11 +71,14 @@ const cards = {
         },
         getPageNumber(state){
             return state.pageNumber
-        }
+        },
     },
     mutations:{
-        UPDATE_CARDS(state, payload){
-            state.cards = payload
+        UPDATE_CARDS_TO_DISPLAY(state, payload){
+            state.cardsToDisplay = payload
+        },
+        UPDATE_ALL_CARDS_STATE(state, payload){
+            state.allCards = payload
         },
         UPDATE_RESULTS(state, payload){
             state.results = payload
@@ -90,7 +97,7 @@ const cards = {
         },
         UPDATE_PAGE_NUMBER(state, payload){
             state.pageNumber = payload
-        }
+        },
     },
 
     actions:{
@@ -102,45 +109,54 @@ const cards = {
          * @returns {Promise<void>}
          */
         async loadCards(context){
-            const url = "https://api.pokemontcg.io/v2/cards";
-                const firebaseResponse = await axios.get(url, {
-                    params:{
-                        'pageSize':64,
-                        'page':context.state.pageNumber
-                    },
+            const url = "https://api.pokemontcg.io/v2/";
+                const cards = await axios.get(url + 'cards', {
                     headers: {
                         'X-Api-Key': 'a866fc6e-69bd-4d6f-8821-cbb658fdca00',
                     }
                 })
 
-                // On envoi les cartes dans l'HTML
-                context.commit('UPDATE_CARDS', firebaseResponse.data.data);
+                const energyCards = await axios.get(url + 'cards?q=supertype:energy', {
+                    headers: {
+                        'X-Api-Key': 'a866fc6e-69bd-4d6f-8821-cbb658fdca00',
+                    }
+                })
+                let allCards = cards.data.data.concat(energyCards.data.data)
+                context.commit('UPDATE_ALL_CARDS_STATE',allCards);
+                context.dispatch('displayCardsChunk', {arraySize:23, chunkIndex:0})
+
          },
 
-        incrementPageNumber(context, payload){
-            console.log('sdffsdfsd',payload)
+        incrementPageNumber(context){
+         if(!context.getters.getPaginationButtonLockedState.right.locked){
+             context.commit('UPDATE_PAGE_NUMBER', context.state.pageNumber + 1)
 
-          if(payload < 53){
-              context.commit('UPDATE_PAGE_NUMBER',payload);
-              context.dispatch('loadCards')
-              context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:false}});
-
-
-          } else if(payload === 53){
-              context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:true}});
-          }
+             if(context.getters.getPageNumber === 21){
+                 context.dispatch('displayCardsChunk', {arraySize:23, chunkIndex:21})
+                 context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:true}});
+             } else {
+                 context.dispatch('displayCardsChunk', {arraySize:23, chunkIndex:context.state.pageNumber})
+                 context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:false}});
+             }
+         }
         },
 
-        decrementPageNumber(context,payload){
+        decrementPageNumber(context){
+            if(!context.getters.getPaginationButtonLockedState.left.locked){
+                if(context.getters.getPaginationButtonLockedState.right.locked){
+                    context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:false}});
+                }
+                if(context.getters.getPageNumber > 1){
+                    context.commit('UPDATE_PAGE_NUMBER', context.getters.getPageNumber - 1);
 
-            if(context.getters.getPaginationButtonLockedState.right.locked){
-                context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:false}});
-            }
-            if(payload === 1){
-                context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:true}, 'right':{locked:false}});
-            } else {
-                context.commit('UPDATE_PAGE_NUMBER',payload);
-                context.dispatch('loadCards')
+                    console.log(context.getters.getPageNumber)
+                    context.dispatch('displayCardsChunk', {arraySize:23, chunkIndex:context.getters.getPageNumber})
+
+                } else {
+                    context.dispatch('displayCardsChunk', {arraySize:23, chunkIndex:0})
+                    context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:true}, 'right':{locked:false}});
+
+                }
             }
         },
 
@@ -216,15 +232,31 @@ const cards = {
         },
 
         async loadSelectedCard(context){
-
             const selectedCards = await axios.get(context.state.baseUrl + '/pokemanager/deck/' + router.currentRoute._value.params.id)
 
             console.log(selectedCards.data)
 
             context.commit('UPDATE_SELECTED_CARDS', selectedCards.data);
+        },
+
+        displayCardsChunk(context, payload){
+            let smallerArrays = [];
+            const arraySize = payload.arraySize;
+            let cards = context.getters.getAllCards
+
+            for (var i=0;i<Math.ceil(cards.length/arraySize);i++) {
+                smallerArrays.push(cards.slice(i*arraySize,i*arraySize+arraySize));
+            }
+
+            context.commit('UPDATE_CARDS_TO_DISPLAY', smallerArrays[payload.chunkIndex]);
+
+            // On divise
+
+console.log(smallerArrays)
+
+            // On envoi les cartes dans l'HTML
 
         }
-
 
 
 
