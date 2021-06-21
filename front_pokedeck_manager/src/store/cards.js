@@ -7,9 +7,9 @@ const cards = {
     state(){
         return {
             cards: {},
-            results:{},
-            isSearching:false,
-            baseUrl:'http://api-partiel.test',
+            results: {},
+            isSearching: false,
+            baseUrl: 'http://api-partiel.test',
             rarities: [
                 "Amazing Rare",
                 "Common",
@@ -35,8 +35,10 @@ const cards = {
                 "Rare Ultra",
                 "Uncommon"
             ],
-            cardCountClickArray:[],
-            selectedCards:[]
+            cardCountClickArray: [],
+            selectedCards: [],
+            paginationButtonLocked: {'left':{locked:true}, 'right':{locked:false}},
+            pageNumber:1
         }
     },
 
@@ -59,6 +61,12 @@ const cards = {
         },
         getSelectedCards(state){
             return state.selectedCards
+        },
+        getPaginationButtonLockedState(state){
+            return state.paginationButtonLocked;
+        },
+        getPageNumber(state){
+            return state.pageNumber
         }
     },
     mutations:{
@@ -76,6 +84,12 @@ const cards = {
         },
         UPDATE_SELECTED_CARDS(state, payload){
             state.selectedCards = payload
+        },
+        UPDATE_PAGINATION_BUTTON_LOCKED(state, payload){
+            state.paginationButtonLocked = payload
+        },
+        UPDATE_PAGE_NUMBER(state, payload){
+            state.pageNumber = payload
         }
     },
 
@@ -91,7 +105,8 @@ const cards = {
             const url = "https://api.pokemontcg.io/v2/cards";
                 const firebaseResponse = await axios.get(url, {
                     params:{
-                        'pageSize':16
+                        'pageSize':64,
+                        'page':context.state.pageNumber
                     },
                     headers: {
                         'X-Api-Key': 'a866fc6e-69bd-4d6f-8821-cbb658fdca00',
@@ -101,6 +116,33 @@ const cards = {
                 // On envoi les cartes dans l'HTML
                 context.commit('UPDATE_CARDS', firebaseResponse.data.data);
          },
+
+        incrementPageNumber(context, payload){
+            console.log('sdffsdfsd',payload)
+
+          if(payload < 53){
+              context.commit('UPDATE_PAGE_NUMBER',payload);
+              context.dispatch('loadCards')
+              context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:false}});
+
+
+          } else if(payload === 53){
+              context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:true}});
+          }
+        },
+
+        decrementPageNumber(context,payload){
+
+            if(context.getters.getPaginationButtonLockedState.right.locked){
+                context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:false}, 'right':{locked:false}});
+            }
+            if(payload === 1){
+                context.commit('UPDATE_PAGINATION_BUTTON_LOCKED', {'left':{locked:true}, 'right':{locked:false}});
+            } else {
+                context.commit('UPDATE_PAGE_NUMBER',payload);
+                context.dispatch('loadCards')
+            }
+        },
 
         /**
          * Action qui gère la recherche

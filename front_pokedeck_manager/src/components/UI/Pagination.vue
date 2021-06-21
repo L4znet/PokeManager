@@ -1,24 +1,32 @@
 <template>
    <section class="pagination">
-     <button><i class="fas fa-chevron-left"></i></button>
-     <button><i class="fas fa-chevron-right"></i></button>
+     <button @click.prevent="decrementPageNumber(pageNumber--)" :class="[getPaginationButtonLockedState.left.locked ? locked : notLocked]"><i class="fas fa-chevron-left"></i></button>
+     <button @click.prevent="incrementPageNumber(pageNumber++)" :class="[getPaginationButtonLockedState.right.locked ? locked : notLocked]">
+       {{pageNumber}}</button>
    </section>
 </template>
 
 <script>
 
 
+import {mapActions, mapGetters} from "vuex";
+
 export default {
   name: 'Pagination',
-  data(){
-    return{
+  data() {
+    return {
+      notLocked: 'pagination_unlocked',
+      locked: 'pagination_locked',
+      pageNumber:1
     }
   },
   mounted() {
   },
   computed: {
+    ...mapGetters("cards", ["getPaginationButtonLockedState"])
   },
   methods: {
+    ...mapActions("cards", ["incrementPageNumber", "decrementPageNumber"]),
   },
 }
 </script>
@@ -39,14 +47,31 @@ export default {
   height:60px;
   border-radius: 50%;
   border:none;
-  background-color: #e33441;
-  color:#FFF;
   margin:0 40px;
 }
 
-.pagination button:hover{
+
+
+.pagination .pagination_unlocked{
+  background-color: #e33441;
+  color:#FFF;
+}
+
+.pagination .pagination_unlocked:hover{
   background-color: #fa4753;
   cursor: pointer;
 }
+
+.pagination .pagination_locked{
+  background-color: #888888;
+  color: #000000;
+}
+
+.pagination .pagination_locked:hover{
+  background-color: #8f8f8f;
+  cursor: not-allowed;
+}
+
+
 
 </style>
