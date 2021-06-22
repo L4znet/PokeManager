@@ -83,7 +83,7 @@ const decks = {
         },
 
         async addDeck(context){
-            if(context.getters.getSelectedEmoji != "" && context.getters.getDeckName != ""){
+            if(context.getters.getSelectedEmoji !== "" && context.getters.getDeckName !== ""){
                 const data = {
                     'deck_name':context.getters.getDeckName,
                     'deck_emoji':context.getters.getSelectedEmoji

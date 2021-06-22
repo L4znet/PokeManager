@@ -5,13 +5,13 @@
         <searchbar></searchbar>
         <cards :addPage="true"></cards>
       </section>
-      <section class="side"  v-if="cardAdded">
+      <section class="side"  v-if="getSelectedCards.length !== 0">
         <ul class="addedCard" v-for="(selectedCard, index) in getSelectedCards" :key="index">
           <li><b>{{ selectedCard.card_quantity }}</b><span>{{ selectedCard.card_name }}</span></li>
         </ul>
       </section>
       <section class="side" v-else>
-       <h1>sdffsdsfd</h1>
+       <h1>Vous n'avez sélectionné aucune carte pour le moment</h1>
       </section>
     </section>
     <section class="selectedDecks" v-else>
@@ -73,6 +73,16 @@ export default {
     height:100vh;
     display: flex;
     flex-direction: column;
+  }
+
+  .addecks section .side h1{
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    color: #c8c8c8;
+    font-size:30px;
+    text-align: center;
   }
 
   .addecks section .side .addedCard{
