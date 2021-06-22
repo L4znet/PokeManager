@@ -1,5 +1,5 @@
 import axios from 'axios'
-import router from '@/router'
+//import router from '@/router'
 
 const cards = {
     namespaced: true,
@@ -49,7 +49,6 @@ const cards = {
                 "Psychic",
                 "Water"
             ],
-            cardCountClickArray: [],
             selectedCards: [],
             paginationButtonLocked: {'left':{locked:true}, 'right':{locked:false}},
             pageNumber:0,
@@ -284,41 +283,21 @@ const cards = {
 
         async addToDeck(context, payload){
             if(payload.addPage) { // Si true on est sur la page de création / modification
-                if(context.getters.getCardCountClickArray.length === 0){
-                    let clickCount = context.getters.getCardCountClickArray;
 
-                    clickCount.push({
-                        'id': payload.cardId,
-                        'quantity':1
-                    })
-                    context.commit('UPDATE_CARD_COUNT_CLICK_ARRAY', clickCount);
+                console.log(context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId)).length)
+
+                if(context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId)).length > 0){
+                    let cardClicked = context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId))[0]
+                    cardClicked.quantity++
+
+                    context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
                 } else {
-                    let clickCount = context.getters.getCardCountClickArray;
-                    if(clickCount.find(card => card.id === payload.cardId)){
-                        let cardToChange = clickCount.find(card => card.id === payload.cardId);
-                        if(cardToChange.quantity <= 3){
-                            cardToChange.quantity++
+                    context.state.selectedCards.push({cardId:payload.cardId, cardName:payload.cardName, quantity: 1})
+                    context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
 
-                            const header = {
-                                'Access-Control-Allow-Origin': '*',
-                                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                            }
 
-                            await axios.post(context.state.baseUrl + '/pokemanager/card', {
-                                id:payload.cardId,
-                                deck_id:router.currentRoute._value.params.id,
-                                card_name:payload.cardName
-                            },header)
-                        }
-                    }
                 }
             }
-        },
-
-        async loadSelectedCard(context){
-            const selectedCards = await axios.get(context.state.baseUrl + '/pokemanager/deck/' + router.currentRoute._value.params.id)
-
-            context.commit('UPDATE_SELECTED_CARDS', selectedCards.data);
         },
 
         /**
