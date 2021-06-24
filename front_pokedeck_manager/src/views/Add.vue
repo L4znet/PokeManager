@@ -7,7 +7,7 @@
       </section>
       <section class="side"  v-if="getSelectedCards.length !== 0">
         <ul class="addedCard" v-for="(selectedCard, index) in getSelectedCards" :key="index">
-          <li><b>{{ selectedCard.card_quantity }}</b><span>{{ selectedCard.card_name }}</span></li>
+          <li><b>x{{ selectedCard.quantity }}</b><span>{{ selectedCard.cardName }}</span></li>
         </ul>
       </section>
       <section class="side" v-else>
@@ -101,6 +101,7 @@ export default {
     border-radius:20px;
     position: relative;
     transition:all 0.3s;
+    font-size:30px;
   }
 
   .addecks section .side .addedCard li{
@@ -114,6 +115,18 @@ export default {
     position: relative;
     transition:all 0.3s;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  .addecks section .side .addedCard li b{
+    margin-left:30px;
+  }
+
+  .addecks section .side .addedCard li span{
+    width:100%;
+    display: flex;
+    justify-content: center;
   }
 
   .addecks section .side .addedCard li:hover:before{

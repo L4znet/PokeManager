@@ -290,7 +290,8 @@ const cards = {
                     let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
                     context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
 
-                        if(cardClicked.quantity < 3 && cardClicked.superType !== "Energy") {
+                    if(card.supertype !== "Energy"){
+                        if(cardClicked.quantity < 3) {
                             context.commit('UPDATE_TOTAL_CARDS', context.state.totalCards + 1)
                             card.cardLocked = false
                             card.cardSelected = true
@@ -305,10 +306,14 @@ const cards = {
                             card.cardSelected = false
 
                             context.commit('UPDATE_CARDS_TO_DISPLAY', context.state.cardsToDisplay)
+
                         }
-                        if(cardClicked.superType === "Energy"){
-                            cardClicked.quantity++
-                        }
+                    } else {
+                        cardClicked.quantity++
+                    }
+
+
+
                     } else {
                         console.log('sfdsdffd')
                         let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
