@@ -3,7 +3,7 @@
 
     <section class="cards" v-if="!getSearchState">
       <pagination></pagination>
-      <card v-for="(card, index) in getCardsToDisplay" :key="index" :picture="card.images.small" @click="addToDeck({cardId:card.id, cardName:card.name, addPage:addPage})"></card>
+      <card v-for="(card, index) in getCardsToDisplay" :key="index" :picture="card.images.small" :cardLocked="card.cardLocked" :cardSelected="card.cardSelected" :addPage="addPage" @click="addToDeck({cardId:card.id, cardName:card.name, addPage:addPage, superType:card.supertype})"></card>
       <pagination></pagination>
     </section>
     <section class="cards" v-else>

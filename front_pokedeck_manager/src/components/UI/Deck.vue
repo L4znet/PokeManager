@@ -2,6 +2,9 @@
 
   <router-link :to="'/add/'+id" class="deck_link">
     <article class="deck">
+      <div v-if="getDeckCompleteState">
+        fdsfsdfsd
+      </div>
       <div class="emoji">
         {{String.fromCodePoint('0x' + deck_emoji)}}
       </div>
@@ -12,6 +15,8 @@
 
 <script>
 
+import {mapGetters} from "vuex";
+
 export default {
   name: 'Deck',
   props:{
@@ -20,10 +25,9 @@ export default {
     deck_emoji:String
 
   },
-  components: {
-  },
-  methods:{
-  },
+  computed:{
+    ...mapGetters('cards', ['getDeckCompleteState'])
+  }
 }
 </script>
 

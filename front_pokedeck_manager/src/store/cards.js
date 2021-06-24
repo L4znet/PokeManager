@@ -52,6 +52,7 @@ const cards = {
             selectedCards: [],
             paginationButtonLocked: {'left':{locked:true}, 'right':{locked:false}},
             pageNumber:0,
+            totalCards:0,
         }
     },
 
@@ -90,6 +91,9 @@ const cards = {
         getPageNumber(state){
             return state.pageNumber
         },
+        getTotalCards(state){
+            return state.totalCards
+        },
     },
     mutations:{
         UPDATE_CARDS_TO_DISPLAY(state, payload){
@@ -115,6 +119,9 @@ const cards = {
         },
         UPDATE_PAGE_NUMBER(state, payload){
             state.pageNumber = payload
+        },
+        UPDATE_TOTAL_CARDS(state, payload){
+            state.totalCards = payload
         },
     },
 
@@ -266,11 +273,6 @@ const cards = {
 
             }
 
-
-            console.log('fsdsfdsfd', results2)
-
-
-
             context.commit('UPDATE_SEARCH_STATE', true);
             context.commit('UPDATE_RESULTS', results);
 
@@ -279,26 +281,49 @@ const cards = {
             }
         },
 
-
-
         async addToDeck(context, payload){
             if(payload.addPage) { // Si true on est sur la page de création / modification
 
-                console.log(context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId)).length)
-
+                // On update à chaque clique sur une carte pour créer un total
                 if(context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId)).length > 0){
                     let cardClicked = context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId))[0]
-                    cardClicked.quantity++
-
-                    context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
-                } else {
-                    context.state.selectedCards.push({cardId:payload.cardId, cardName:payload.cardName, quantity: 1})
+                    let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
                     context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
 
+                        if(cardClicked.quantity < 3 && cardClicked.superType !== "Energy") {
+                            context.commit('UPDATE_TOTAL_CARDS', context.state.totalCards + 1)
+                            card.cardLocked = false
+                            card.cardSelected = true
 
+                            if (!card.cardLocked) {
+                                cardClicked.quantity++
+                            }
+                        } else {
+                            cardClicked.quantity = 4
+
+                            card.cardLocked = true
+                            card.cardSelected = false
+
+                            context.commit('UPDATE_CARDS_TO_DISPLAY', context.state.cardsToDisplay)
+                        }
+                        if(cardClicked.superType === "Energy"){
+                            cardClicked.quantity++
+                        }
+                    } else {
+                        console.log('sfdsdffd')
+                        let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
+                        context.commit('UPDATE_TOTAL_CARDS', context.state.totalCards + 1)
+
+                        card.cardSelected = true
+
+                        context.commit('UPDATE_CARDS_TO_DISPLAY', context.state.cardsToDisplay)
+
+                        context.state.selectedCards.push({cardId:payload.cardId, cardName:payload.cardName, quantity: 1})
+                        context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
+                    }
                 }
-            }
         },
+
 
         /**
          * Action qui va diviser toutes les cartes chargé en petit groupe et va les envoyer vers le front
