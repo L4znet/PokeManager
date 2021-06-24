@@ -1,6 +1,6 @@
 <template>
   <section class="searchbar">
-    <search-bar-elements></search-bar-elements>
+    <search-bar-elements :isDeckDetail="isDeckDetail"></search-bar-elements>
 
     <filters></filters>
   </section>
@@ -15,7 +15,10 @@ export default {
   components: {
     Filters,
     SearchBarElements
-  }
+  },
+  props: {
+    isDeckDetail: Boolean,
+  },
 }
 </script>
 

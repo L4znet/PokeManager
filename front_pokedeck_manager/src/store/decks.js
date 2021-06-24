@@ -109,7 +109,7 @@ const decks = {
             } else {
                 context.commit('UPDATE_EDIT_DECK_STATE', true);
             }
-        }
+        },
     },
 
 }

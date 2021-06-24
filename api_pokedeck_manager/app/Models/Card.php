@@ -9,6 +9,9 @@ class Card extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['id', 'deck_id', 'card_name', 'card_quantity'];
+    protected $fillable = ['id', 'deck_id', 'card_name', 'card_quantity', 'card_picture'];
 
+    protected $keyType = 'string';
+
+    public $incrementing = false;
 }

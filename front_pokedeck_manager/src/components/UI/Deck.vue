@@ -1,6 +1,6 @@
 <template>
 
-  <router-link :to="'/add/'+id" class="deck_link">
+  <router-link :to="'/deck/'+id" class="deck_link">
     <article class="deck">
       <div v-if="getDeckCompleteState">
         fdsfsdfsd

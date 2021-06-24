@@ -1,6 +1,12 @@
 <template>
-  <form action="">
-    <input type="search" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getAllCards})" placeholder="Recherchez une carte...">
+  <form action="" v-if="isDeckDetail">
+    <input type="search" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getDeckCards.data, isDeckDetail:true})" placeholder="Recherchez une carte...">
+  </form>
+
+
+  <form action="" v-else>
+
+    <input type="search" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getAllCards, isDeckDetail:false})" placeholder="Recherchez une carte...">
   </form>
 </template>
 
@@ -14,11 +20,14 @@ export default {
       searchTerm:''
     }
   },
+  props: {
+    isDeckDetail: Boolean,
+  },
   methods:{
     ...mapActions("cards", ["searchValue"])
   },
   computed: {
-    ...mapGetters("cards", ["getAllCards"])
+    ...mapGetters("cards", ["getAllCards", "getDeckCards"])
   },
 }
 </script>

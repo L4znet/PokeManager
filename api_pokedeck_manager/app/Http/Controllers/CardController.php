@@ -13,7 +13,7 @@ class CardController extends Controller
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index($id_deck)
+    public function index()
     {
         return CardResource::collection(Card::paginate(10));
     }
@@ -29,11 +29,12 @@ class CardController extends Controller
             'id' => 'required',
             'deck_id' => 'required|integer|exists:decks,id',
             'card_name' => 'required',
+            'card_picture' => 'required',
         ]);
 
-        return response()->json(Card::updatCreate(
+        return response()->json(Card::updateOrCreate(
             ['id' => $data['id'], 'deck_id' => $data['deck_id']],
-            ['card_name' => $data['card_name']])->increment('card_quantity'));
+            ['card_name' => $data['card_name'], 'card_picture' => $data['card_picture']])->increment('card_quantity'));
     }
 
     /**

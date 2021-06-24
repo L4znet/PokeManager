@@ -1,11 +1,10 @@
 <template>
   <article class="card" :class="{ card__add_page: addPage, highlight_card:cardSelected, lock_card:cardLocked }">
-    <img :src="picture" >
+    <img :src="picture">
   </article>
 </template>
 
 <script>
-import {mapGetters} from "vuex";
 
 export default {
   name: 'Card',

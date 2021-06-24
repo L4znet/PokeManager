@@ -18,7 +18,8 @@ class CardResource extends JsonResource
          'id' => $this->id,
          'deck_id' => $this->deck_id,
          'card_name' => $this->card_name,
-         'card_quantity' => $this->card_quantity
+         'card_quantity' => $this->card_quantity,
+         'card_picture' => $this->card_picture
      ];
     }
 }

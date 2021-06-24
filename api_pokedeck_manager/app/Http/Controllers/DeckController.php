@@ -44,6 +44,7 @@ class DeckController extends Controller
      */
     public function show($id)
     {
+
         return response()->json(Deck::find($id)->cards);
     }
 

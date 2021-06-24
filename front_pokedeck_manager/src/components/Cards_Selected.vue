@@ -3,12 +3,12 @@
 
     <section class="cards" v-if="!getSearchState">
       <pagination></pagination>
-      <card v-for="(card, index) in getCardsToDisplay" :key="index" :picture="card.images.small" :cardLocked="card.cardLocked" :cardSelected="card.cardSelected" :addPage="addPage" @click="addToDeck({cardId:card.id, cardName:card.name, cardPicture:card.images.small, addPage:addPage, superType:card.supertype})"></card>
+      <card v-for="(card, index) in getDeckCards.data" :key="index" :picture="card.card_picture"></card>
       <pagination></pagination>
     </section>
     <section class="cards" v-else>
       <h2>{{ getSearchResults.length }} résultats pour votre recherche</h2>
-      <card v-for="(card, index) in getSearchResults" :key="index" :picture="card.images.small" @click="addToDeck({cardName:card.name, addPage:addPage})"></card>
+      <card v-for="(card, index) in getSearchResults" :key="index" :picture="card.card_picture"></card>
     </section>
   </transition>
 
@@ -21,7 +21,7 @@ import Pagination from './UI/Pagination.vue'
 import {mapActions, mapGetters, mapState} from 'vuex'
 
 export default {
-  name: 'Cards',
+  name: 'Cards_Selected',
   components: {
     Card,Pagination
   },
@@ -37,7 +37,7 @@ export default {
     this.loadCards()
   },
   computed: {
-    ...mapGetters("cards", ["getCardsToDisplay", "getSearchResults", "getSearchState", "getCardsLoadedCount", "getCardsLoadedState"]),
+    ...mapGetters("cards", ["getDeckCards", "getSearchResults", "getSearchState"]),
     ...mapState("cards", ["pendingRequest"]),
   },
   methods: {

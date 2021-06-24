@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from "../router";
 //import router from '@/router'
 
 const cards = {
@@ -53,6 +54,7 @@ const cards = {
             paginationButtonLocked: {'left':{locked:true}, 'right':{locked:false}},
             pageNumber:0,
             totalCards:0,
+            deckCards:{}
         }
     },
 
@@ -94,6 +96,9 @@ const cards = {
         getTotalCards(state){
             return state.totalCards
         },
+        getDeckCards(state){
+            return state.deckCards
+        }
     },
     mutations:{
         UPDATE_CARDS_TO_DISPLAY(state, payload){
@@ -122,6 +127,9 @@ const cards = {
         },
         UPDATE_TOTAL_CARDS(state, payload){
             state.totalCards = payload
+        },
+        UPDATE_DECK_CARDS(state, payload){
+            state.deckCards = payload
         },
     },
 
@@ -222,19 +230,42 @@ const cards = {
          */
         searchValue(context, payload){
 
-            // On filtre avec le searchTerm
-            let results = payload.cards.filter(item => {
-                return item.name.includes(payload.searchTerm);
-            }, payload.searchTerm);
 
-            // On active le mode recherche et on envoi les résultats dans le front
-            context.commit('UPDATE_SEARCH_STATE', true);
-            context.commit('UPDATE_RESULTS', results);
+            if(payload.isDeckDetail){
 
-            // Si le searchTerm est vide, on arrête le mode "Recherche"
-            if(payload.searchTerm === ""){
-                context.commit('UPDATE_SEARCH_STATE', false);
+                // On filtre avec le searchTerm
+                let results = payload.cards.filter(item => {
+                    return item.card_name.includes(payload.searchTerm);
+                }, payload.searchTerm);
+
+                console.log(results)
+
+                // On active le mode recherche et on envoi les résultats dans le front
+                context.commit('UPDATE_SEARCH_STATE', true);
+                context.commit('UPDATE_RESULTS', results);
+
+                // Si le searchTerm est vide, on arrête le mode "Recherche"
+                if(payload.searchTerm === ""){
+                    context.commit('UPDATE_SEARCH_STATE', false);
+                }
+
+            } else {
+                // On filtre avec le searchTerm
+                let results = payload.cards.filter(item => {
+                    return item.name.includes(payload.searchTerm);
+                }, payload.searchTerm);
+
+                // On active le mode recherche et on envoi les résultats dans le front
+                context.commit('UPDATE_SEARCH_STATE', true);
+                context.commit('UPDATE_RESULTS', results);
+
+                // Si le searchTerm est vide, on arrête le mode "Recherche"
+                if(payload.searchTerm === ""){
+                    context.commit('UPDATE_SEARCH_STATE', false);
+                }
             }
+
+
         },
 
         /**
@@ -298,9 +329,28 @@ const cards = {
 
                             if (!card.cardLocked) {
                                 cardClicked.quantity++
+                                const header = {
+                                    'Access-Control-Allow-Origin': '*',
+                                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                                }
+
+                                console.log(payload.cardId)
+
+                                const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity: cardClicked.quantity + 1, deck_id:router.currentRoute._value.params.id}
+
+                                await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
                             }
                         } else {
                             cardClicked.quantity = 4
+
+                            const header = {
+                                'Access-Control-Allow-Origin': '*',
+                                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                            }
+
+                            const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity: cardClicked.quantity + 1, deck_id:router.currentRoute._value.params.id}
+
+                            await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
 
                             card.cardLocked = true
                             card.cardSelected = false
@@ -310,12 +360,20 @@ const cards = {
                         }
                     } else {
                         cardClicked.quantity++
+
+                        const header = {
+                            'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                        }
+
+                        const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity: cardClicked.quantity + 1, deck_id:router.currentRoute._value.params.id}
+
+                        await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
+
                     }
 
 
-
                     } else {
-                        console.log('sfdsdffd')
                         let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
                         context.commit('UPDATE_TOTAL_CARDS', context.state.totalCards + 1)
 
@@ -325,6 +383,17 @@ const cards = {
 
                         context.state.selectedCards.push({cardId:payload.cardId, cardName:payload.cardName, quantity: 1})
                         context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
+
+
+                        const header = {
+                            'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                        }
+
+                        const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity: 1, deck_id:router.currentRoute._value.params.id}
+
+                        await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
+
                     }
                 }
         },
@@ -348,6 +417,17 @@ const cards = {
 
             context.commit('UPDATE_CARDS_TO_DISPLAY', smallerArrays[payload.chunkIndex]);
             // On envoi les cartes dans l'HTML
+        },
+
+        async loadCardsToDeck(context){
+            const header = {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+            }
+
+            let cardToDisplay = await axios.get(context.state.baseUrl + '/pokemanager/deck/' + router.currentRoute._value.params.id, header)
+
+            context.commit('UPDATE_DECK_CARDS', cardToDisplay);
         }
     },
 

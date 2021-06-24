@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import MyDecks from '../views/MyDecks.vue'
 import Add from '../views/Add.vue'
+import Deck from '../views/Deck.vue'
 
 const routes = [
   {
@@ -23,6 +24,11 @@ const routes = [
     path: '/add/:id',
     name: 'AddId',
     component: Add
+  },
+  {
+    path: '/deck/:id',
+    name: 'deck',
+    component: Deck
   },
 ]
 
