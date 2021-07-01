@@ -1,5 +1,4 @@
-<template>
-  <section class="decks" v-if="getDecks.length !== 0">
+<template><section class="decks" v-if="length !== null && length !== 0">
     <deck v-for="(deck, index) in getDecks.data" :key="index" :id="deck.id" :deck_name="deck.deck_name" :deck_emoji="deck.deck_emoji"></deck>
   </section>
   <section class="decks" v-else>
@@ -18,12 +17,31 @@ export default {
   },
   computed:{
     ...mapGetters("decks", ["getDecks"]),
+    ...mapGetters("cards", ["getDeckCards"]),
   },
   methods:{
-    ...mapActions("decks", ["getAllDecks"])
+    ...mapActions("decks", ["getAllDecks"]),
+    trueFalse(array){
+      console.log(array.length)
+    }
+  },
+  data() {
+    return {
+      length: null
+    }
+  },
+
+  /**
+   * .length ne fonctionne pas directement sur le tableau, donc on utilise le .watch
+   */
+  watch: {
+    getDecks() {
+      this.length = this.getDecks.data.length
+    }
   },
   mounted() {
     this.getAllDecks()
+
   }
 }
 </script>

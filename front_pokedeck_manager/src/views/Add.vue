@@ -5,10 +5,17 @@
         <searchbar></searchbar>
         <cards :addPage="true"></cards>
       </section>
-      <section class="side"  v-if="getSelectedCards.length !== 0">
-        <ul class="addedCard" v-for="(selectedCard, index) in getSelectedCards" :key="index">
-          <li><b>x{{ selectedCard.quantity }}</b><span>{{ selectedCard.cardName }}</span></li>
+      <section class="side" v-if="length !== 0">
+
+        <router-link :to="'/deck/'+id" class="edit_deck">
+          Retourner au deck
+        </router-link>
+
+        <ul class="addedCard" v-for="(deckCard, index) in getDeckCards.data" :key="index">
+          <li class="decremente" v-if="deckCard.card_quantity > 1" @click="deleteCardFromDeck(deckCard.id)"><b>x{{ deckCard.card_quantity }}</b><span>{{ deckCard.card_name }}</span></li>
+          <li class="delete" v-else-if="deckCard.card_quantity === 1" @click="deleteCardFromDeck(deckCard.id)"><b>x{{ deckCard.card_quantity }}</b><span>{{ deckCard.card_name }}</span></li>
         </ul>
+
       </section>
       <section class="side" v-else>
        <h1>Vous n'avez sélectionné aucune carte pour le moment</h1>
@@ -30,12 +37,24 @@ import Searchbar from '@/components/SearchBar.vue'
 import Cards from '@/components/Cards.vue'
 import emojiselector from '@/components/Emoji_selector.vue'
 import {mapActions, mapGetters} from "vuex";
+import router from "../router";
 
 export default {
   name: 'Add',
   data() {
     return {
-      cardAdded:true
+      cardAdded:true,
+      id:router.currentRoute._value.params.id,
+      length: null
+    }
+  },
+
+  /**
+   * .length ne fonctionne pas directement sur le tableau, donc on utilise le .watch
+   */
+  watch: {
+    getDecks() {
+      this.length = this.getDecks.data.length
     }
   },
   components: {
@@ -46,12 +65,12 @@ export default {
   },
 
   computed:{
-    ...mapGetters("decks", ["getEditDeckState"]),
-    ...mapGetters("cards", ["getSelectedCards"]),
+    ...mapGetters("decks", ["getEditDeckState", "getDecks"]),
+    ...mapGetters("cards", ["getSelectedCards", "getDeckCards"]),
   },
   methods:{
     ...mapActions("decks", ["changeDeckName", "switchToEdit"]),
-    ...mapActions("cards", ["loadSelectedCard"])
+    ...mapActions("cards", ["loadSelectedCard", "deleteCardFromDeck"])
   },
 }
 </script>

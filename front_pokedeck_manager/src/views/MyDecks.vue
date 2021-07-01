@@ -1,5 +1,7 @@
 <template>
-  <decks></decks>
+  <div>
+    <decks></decks>
+  </div>
 </template>
 
 <script>

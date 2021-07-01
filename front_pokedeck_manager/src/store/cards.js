@@ -54,7 +54,9 @@ const cards = {
             paginationButtonLocked: {'left':{locked:true}, 'right':{locked:false}},
             pageNumber:0,
             totalCards:0,
-            deckCards:{}
+            deckCards:{},
+            quantity:0,
+            loadingState:false
         }
     },
 
@@ -98,6 +100,12 @@ const cards = {
         },
         getDeckCards(state){
             return state.deckCards
+        },
+        getQuantity(state){
+            return state.quantity
+        },
+        getLoadingState(state){
+            return state.loadingState
         }
     },
     mutations:{
@@ -131,6 +139,12 @@ const cards = {
         UPDATE_DECK_CARDS(state, payload){
             state.deckCards = payload
         },
+        UPDATE_QUANTITY(state, payload){
+            state.quantity = payload
+        },
+        UPDATE_LOADING_STATE(state, payload){
+            state.loadingState = payload
+        }
     },
 
     actions:{
@@ -279,8 +293,6 @@ const cards = {
             let results = []
             let results2 = []
 
-            console.log()
-
             switch (payload.filterType){
                 case "rarity":
                     results = []
@@ -313,16 +325,19 @@ const cards = {
         },
 
         async addToDeck(context, payload){
+
             if(payload.addPage) { // Si true on est sur la page de création / modification
 
-                // On update à chaque clique sur une carte pour créer un total
-                if(context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId)).length > 0){
+                if(context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId)).length !== 0){
                     let cardClicked = context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId))[0]
                     let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
                     context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
 
                     if(card.supertype !== "Energy"){
-                        if(cardClicked.quantity < 3) {
+
+                        console.log(context.getters.getSelectedCards)
+
+                        if(cardClicked.quantity < 4) {
                             context.commit('UPDATE_TOTAL_CARDS', context.state.totalCards + 1)
                             card.cardLocked = false
                             card.cardSelected = true
@@ -334,29 +349,10 @@ const cards = {
                                     'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                                 }
 
-                                console.log(payload.cardId)
-
-                                const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity: cardClicked.quantity + 1, deck_id:router.currentRoute._value.params.id}
+                                const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity:cardClicked.quantity, deck_id:router.currentRoute._value.params.id}
 
                                 await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
                             }
-                        } else {
-                            cardClicked.quantity = 4
-
-                            const header = {
-                                'Access-Control-Allow-Origin': '*',
-                                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                            }
-
-                            const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity: cardClicked.quantity + 1, deck_id:router.currentRoute._value.params.id}
-
-                            await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
-
-                            card.cardLocked = true
-                            card.cardSelected = false
-
-                            context.commit('UPDATE_CARDS_TO_DISPLAY', context.state.cardsToDisplay)
-
                         }
                     } else {
                         cardClicked.quantity++
@@ -366,36 +362,36 @@ const cards = {
                             'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                         }
 
-                        const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity: cardClicked.quantity + 1, deck_id:router.currentRoute._value.params.id}
+                        const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity:cardClicked.quantity, deck_id:router.currentRoute._value.params.id}
 
                         await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
 
                     }
+                } else {
 
+                    let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
+                    context.commit('UPDATE_TOTAL_CARDS', context.state.totalCards + 1)
 
-                    } else {
-                        let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
-                        context.commit('UPDATE_TOTAL_CARDS', context.state.totalCards + 1)
+                    card.cardSelected = true
 
-                        card.cardSelected = true
+                    context.commit('UPDATE_CARDS_TO_DISPLAY', context.state.cardsToDisplay)
 
-                        context.commit('UPDATE_CARDS_TO_DISPLAY', context.state.cardsToDisplay)
+                    context.state.selectedCards.push({cardId:payload.cardId, cardName:payload.cardName, quantity: 1})
+                    context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
 
-                        context.state.selectedCards.push({cardId:payload.cardId, cardName:payload.cardName, quantity: 1})
-                        context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
-
-
-                        const header = {
-                            'Access-Control-Allow-Origin': '*',
-                            'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                        }
-
-                        const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity: 1, deck_id:router.currentRoute._value.params.id}
-
-                        await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
-
-                    }
+                const header = {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                 }
+
+                const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture,card_quantity:1, deck_id:router.currentRoute._value.params.id}
+
+
+                await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
+                }
+            }
+
+            context.dispatch('loadCardsToDeck')
         },
 
 
@@ -428,6 +424,57 @@ const cards = {
             let cardToDisplay = await axios.get(context.state.baseUrl + '/pokemanager/deck/' + router.currentRoute._value.params.id, header)
 
             context.commit('UPDATE_DECK_CARDS', cardToDisplay);
+        },
+
+        async deleteCardFromDeck(context, payload){
+
+            // On défini un état de chargement pour brider et empêcher le spam, tant que le loading state n'est pas repassé à false on empêche le clique
+            if(!context.getters.getLoadingState){
+
+                // Au clique on active le changement de state
+                context.commit('UPDATE_LOADING_STATE', true)
+
+                let card = context.getters.getDeckCards.data.filter(({ id }) => id.includes(payload))[0]
+                card.card_quantity--
+
+                context.commit('UPDATE_DECK_CARDS',context.getters.getDeckCards)
+
+                // En fonction de la quantité
+                if(card.card_quantity > 0){
+                    // On update
+                    const header = {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                    }
+
+                    let response = await axios.put(context.state.baseUrl + '/pokemanager/card/' + payload, header)
+
+                    if(response.status === 200 || response.status === 500 || response.status === 428){
+                        context.commit('UPDATE_LOADING_STATE', false)
+                        context.dispatch('loadCardsToDeck')
+                    }
+
+                } else {
+
+                    // On delete
+                    const header = {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                    }
+
+                    let response = await axios.delete(context.state.baseUrl + '/pokemanager/card/' + payload, header)
+                    if(response.status === 200 || response.status === 500 || response.status === 428){
+
+                        // Pour éviter de bloquer l'utilisateur si l'on rencontre une erreur, on désactive le loading dans tous les cas
+                        context.commit('UPDATE_LOADING_STATE', false)
+                        context.dispatch('loadCardsToDeck')
+                    }
+                }
+
+
+            }
+
+
         }
     },
 

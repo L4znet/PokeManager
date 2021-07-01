@@ -30,11 +30,13 @@ class CardController extends Controller
             'deck_id' => 'required|integer|exists:decks,id',
             'card_name' => 'required',
             'card_picture' => 'required',
+            'card_quantity' => 'required',
         ]);
 
-        return response()->json(Card::updateOrCreate(
+      return response()->json(Card::updateOrCreate(
             ['id' => $data['id'], 'deck_id' => $data['deck_id']],
-            ['card_name' => $data['card_name'], 'card_picture' => $data['card_picture']])->increment('card_quantity'));
+            ['card_name' => $data['card_name'], 'card_picture' => $data['card_picture'], 'card_quantity' => $data['card_quantity']]));
+
     }
 
     /**
@@ -54,21 +56,21 @@ class CardController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
-        //
+       return response()->json(Card::where('id', '=', $id)->decrement('card_quantity'));
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
-        //
+        return response()->json(Card::where('id', '=', $id)->delete());
     }
 }
