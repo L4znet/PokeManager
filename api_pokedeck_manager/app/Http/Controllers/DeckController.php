@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\DeckResource;
+use App\Models\Card;
 use App\Models\Deck;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -33,7 +34,9 @@ class DeckController extends Controller
             'deck_emoji' => 'required'
         ]);
 
-        return response()->json(Deck::create($data));
+        return response()->json(Deck::updateOrCreate(
+            ['deck_name' => $data['deck_name']],
+            ['deck_name' => $data['deck_name'], 'deck_emoji' => $data['deck_emoji']]));
     }
 
     /**
