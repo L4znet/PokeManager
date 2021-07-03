@@ -1,8 +1,11 @@
 <template>
-  <article class="card" :class="{ card__add_page: addPage, highlight_card:cardSelected, lock_card:cardLocked }">
+  <article class="card" :class="{ card__add_page: addPage, highlight_card:cardSelected, lock_card:cardLocked, }">
+    <div class="card_quantity" v-if="quantity > 1">{{quantity}}</div>
     <img :src="picture">
   </article>
 </template>
+
+
 
 <script>
 
@@ -10,6 +13,7 @@ export default {
   name: 'Card',
   props:{
     picture:String,
+    quantity:Number,
     addPage:Boolean,
     cardSelected:Boolean,
     cardLocked:Boolean
@@ -26,6 +30,21 @@ export default {
     margin:0 10px 40px 10px;
     border-radius:10px;
     cursor: pointer;
+    position: relative;
+  }
+
+  .card .card_quantity{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background-color: #e33441;
+    position: absolute;
+    top:-10px;
+    left:-10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color:#FFF;
   }
 
 
