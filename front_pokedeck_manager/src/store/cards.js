@@ -328,6 +328,9 @@ const cards = {
 
             if(payload.addPage) { // Si true on est sur la page de création / modification
 
+                console.log(context.getters.getSelectedCards)
+
+
                 if(context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId)).length !== 0){
                     let cardClicked = context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId))[0]
                     let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
