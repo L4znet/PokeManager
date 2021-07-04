@@ -13,6 +13,7 @@ const cards = {
             isSearching: false,
             baseUrl: 'http://api-partiel.test',
             rarities: [
+                "Tous",
                 "Amazing Rare",
                 "Common",
                 "LEGEND",
@@ -38,6 +39,7 @@ const cards = {
                 "Uncommon"
             ],
             types: [
+                "Tous",
                 "Colorless",
                 "Darkness",
                 "Dragon",
@@ -50,6 +52,105 @@ const cards = {
                 "Psychic",
                 "Water"
             ],
+            sets:[
+                "Tous",
+                "Base",
+                "Jungle",
+                "Wizards Black Star Promos",
+                "Fossil",
+                "Team Rocket",
+                "Gym Heroes",
+                "Gym Challenge",
+                "Neo Genesis",
+                "Neo Discovery",
+                "Southern Islands",
+                "Neo Revelation",
+                "Neo Destiny",
+                "Legendary Collection",
+                "Expedition Base Set",
+                "Aquapolis",
+                "Skyridge",
+                "Sandstorm",
+                "Dragon",
+                "Nintendo Black Star Promos",
+                "Team Magma vs Team Aqua",
+                "Hidden Legends",
+                "Team Rocket Returns",
+                "Deoxys",
+                "Emerald",
+                "Unseen Forces",
+                "Delta Species",
+                "Legend Maker",
+                "Holon Phantoms",
+                "Crystal Guardians",
+                "Dragon Frontiers",
+                "Power Keepers",
+                "DP Black Star Promos",
+                "Mysterious Treasures",
+                "Secret Wonders",
+                "Great Encounters",
+                "Majestic Dawn",
+                "Legends Awakened",
+                "Stormfront",
+                "Platinum",
+                "Rising Rivals",
+                "Supreme Victors",
+                "Arceus",
+                "HGSS Black Star Promos",
+                "Call of Legends",
+                "BW Black Star Promos",
+                "Emerging Powers",
+                "Noble Victories",
+                "Next Destinies",
+                "Dark Explorers",
+                "Dragons Exalted",
+                "Dragon Vault",
+                "Boundaries Crossed",
+                "Plasma Storm",
+                "Plasma Freeze",
+                "Plasma Blast",
+                "XY Black Star Promos",
+                "Legendary Treasures",
+                "Kalos Starter Set",
+                "XY",
+                "Flashfire",
+                "Furious Fists",
+                "Phantom Forces",
+                "Primal Clash",
+                "Double Crisis",
+                "Roaring Skies",
+                "Ancient Origins",
+                "BREAKthrough",
+                "BREAKpoint",
+                "Generations",
+                "Fates Collide",
+                "Steam Siege",
+                "Evolutions",
+                "SM Black Star Promos",
+                "Guardians Rising",
+                "Burning Shadows",
+                "Shining Legends",
+                "Crimson Invasion",
+                "Ultra Prism",
+                "Forbidden Light",
+                "Celestial Storm",
+                "Dragon Majesty",
+                "Lost Thunder",
+                "Team Up",
+                "Detective Pikachu",
+                "Unbroken Bonds",
+                "Unified Minds",
+                "Hidden Fates",
+                "Shiny Vault",
+                "Cosmic Eclipse",
+                "SWSH Black Star Promos",
+                "Rebel Clash",
+                "Darkness Ablaze",
+                "Vivid Voltage",
+                "Shining Fates",
+                "Shiny Vault",
+                "Battle Styles",
+                "Chilling Reign"],
             selectedCards: [],
             paginationButtonLocked: {'left': {locked: true}, 'right': {locked: false}},
             pageNumber: 0,
@@ -114,6 +215,9 @@ const cards = {
         },
         getCurrentDeckInfo(state){
             return state.currentDeckInfo
+        },
+        getAllSet(state){
+            return state.sets
         }
     },
     mutations:{
@@ -301,35 +405,47 @@ const cards = {
          * @param payload
          */
         filterBy(context, payload){
-
             let results = []
-            let results2 = []
-
             switch (payload.filterType){
                 case "rarity":
-                    results = []
                     for (let i = 0; i < context.getters.getAllCards.length; i++) {
                         if(context.getters.getAllCards[i].rarity === payload.filterValue){
                             results.push(context.getters.getAllCards[i])
+                            context.commit('UPDATE_RESULTS', results);
+                            context.commit('UPDATE_SEARCH_STATE', true);
+                        } else if( payload.filterValue === "Tous"){
+                            console.log('fsdsdffsd')
+                            context.commit('UPDATE_SEARCH_STATE', false);
                         }
                     }
+
                     break;
                 case "types":
-                    results = []
                     for (let i = 0; i < context.getters.getAllCards.length; i++) {
-                        if(context.getters.getAllCards[i].types[0] === payload.filterValue){
-                         results2.push(context.getters.getAllCards[i])
+                        if(context.getters.getAllCards[i].supertype === "Pokémon"){
+                            if(context.getters.getAllCards[i].types[0] === payload.filterValue){
+                                results.push(context.getters.getAllCards[i])
+                                context.commit('UPDATE_RESULTS', results);
+                                context.commit('UPDATE_SEARCH_STATE', true);
+                            }  else if( payload.filterValue === "Tous"){
+                                context.commit('UPDATE_SEARCH_STATE', false);
+                            }
                         }
                     }
                     break;
                 case "set":
+                    for (let i = 0; i < context.getters.getAllCards.length; i++) {
 
+                        if(context.getters.getAllCards[i].set.name === payload.filterValue){
+                            results.push(context.getters.getAllCards[i])
+                            context.commit('UPDATE_RESULTS', results);
+                        }  else if( payload.filterValue === "Tous"){
+                            context.commit('UPDATE_SEARCH_STATE', false);
+                        }
+                    }
                     break;
 
             }
-
-            context.commit('UPDATE_SEARCH_STATE', true);
-            context.commit('UPDATE_RESULTS', results);
 
             if(payload.filterValue === ""){
                 context.commit('UPDATE_SEARCH_STATE', false);
