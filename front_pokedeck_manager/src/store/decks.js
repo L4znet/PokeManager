@@ -135,7 +135,9 @@ const decks = {
         async getAllDecks(context){
             const decks = await axios.get(context.state.baseUrl + '/pokemanager/deck')
             context.commit('UPDATE_DECKS', decks.data);
-            console.log(context.getters.getDecks.data.length)
+
+
+            console.log(decks)
         },
         switchToEdit(context){
             if(router.currentRoute._value.params.id === undefined){

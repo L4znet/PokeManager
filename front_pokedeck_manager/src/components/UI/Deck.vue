@@ -2,8 +2,8 @@
 
   <router-link :to="'/deck/'+id" class="deck_link">
     <article class="deck">
-      <div v-if="getDeckCompleteState">
-        fdsfsdfsd
+      <div class="is_locked" v-if="is_complete === 1">
+        <i class="fas fa-lock"></i>
       </div>
       <div class="emoji">
         {{String.fromCodePoint('0x' + deck_emoji)}}
@@ -22,7 +22,8 @@ export default {
   props:{
     id:Number,
     deck_name:String,
-    deck_emoji:String
+    deck_emoji:String,
+    is_complete:Number
 
   },
   computed:{
@@ -45,6 +46,7 @@ export default {
   position: relative;
   transition:all 0.3s;
   cursor: pointer;
+  position: relative;
 }
 
 .deck:hover{
@@ -67,6 +69,18 @@ export default {
   width:100%;
   height:100%;
   font-size:70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.deck .is_locked{
+  width:100%;
+  height:100%;
+  background-color: rgba(255, 255, 255, 0.87);
+  position: absolute;
+  font-size:60px;
+  color: #e33441;
   display: flex;
   justify-content: center;
   align-items: center;

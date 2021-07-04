@@ -257,8 +257,6 @@ const cards = {
          * @param payload
          */
         searchValue(context, payload){
-
-
             if(payload.isDeckDetail){
 
                 // On filtre avec le searchTerm
@@ -415,7 +413,7 @@ const cards = {
 
 
            if(context.getters.getCurrentDeckInfo.is_complete === 0){
-               if(numberTotalCards === 60){
+               if(numberTotalCards === 59){
                    context.commit('UPDATE_TOTAL_CARDS', 60)
 
                    context.getters.getDeckCompletedList[deckId] = {id:deckId, completed:true}
@@ -426,8 +424,9 @@ const cards = {
                    }
                    context.commit('UPDATE_TOTAL_CARDS', 0)
                    await axios.patch(context.state.baseUrl + '/pokemanager/deck/'+ deckId +'/completed', {is_complete:true}, header)
+                  await  context.dispatch('addToDeck', payload)
                } else {
-                   context.dispatch('addToDeck', payload)
+                   await context.dispatch('addToDeck', payload)
                }
            }
 

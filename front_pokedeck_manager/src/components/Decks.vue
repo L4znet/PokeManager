@@ -1,5 +1,6 @@
-<template><section class="decks" v-if="length !== null && length !== 0">
-    <deck v-for="(deck, index) in getDecks.data" :key="index" :id="deck.id" :deck_name="deck.deck_name" :deck_emoji="deck.deck_emoji"></deck>
+<template>
+  <section class="decks" v-if="length !== null && length !== 0">
+    <deck v-for="(deck, index) in getDecks.data" :key="index" :id="deck.id" :deck_name="deck.deck_name" :deck_emoji="deck.deck_emoji" :is_complete="deck.is_complete"></deck>
   </section>
   <section class="decks" v-else>
     <h1>Aucun deck de créé pour le moment</h1>

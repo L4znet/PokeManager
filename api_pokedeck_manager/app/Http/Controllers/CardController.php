@@ -60,7 +60,6 @@ class CardController extends Controller
      */
     public function decrement_card_quantity($id)
     {
-
        return response()->json(Card::where('id', '=', $id)->decrement('card_quantity'));
     }
 
