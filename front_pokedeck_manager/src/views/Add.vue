@@ -11,7 +11,7 @@
           Retourner au deck
         </router-link>
 
-        <ul class="addedCard" v-for="(deckCard, index) in getDeckCards.data" :key="index">
+        <ul class="addedCard" v-for="(deckCard, index) in getDeckCards" :key="index">
           <li class="decremente" v-if="deckCard.card_quantity > 1" @click="deleteCardFromDeck(deckCard.id)"><b>x{{ deckCard.card_quantity }}</b><span>{{ deckCard.card_name }}</span></li>
           <li class="delete" v-else-if="deckCard.card_quantity === 1" @click="deleteCardFromDeck(deckCard.id)"><b>x{{ deckCard.card_quantity }}</b><span>{{ deckCard.card_name }}</span></li>
         </ul>

@@ -17,6 +17,7 @@ class CreateDecksTable extends Migration
             $table->id();
             $table->string('deck_name');
             $table->string('deck_emoji');
+            $table->boolean('is_complete')->default(false);
             $table->timestamps();
         });
     }

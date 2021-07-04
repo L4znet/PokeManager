@@ -52,14 +52,15 @@ class CardController extends Controller
 
 
     /**
-     * Update the specified resource in storage.
+     * For decrement the specified card's quantity
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
+     *
      */
-    public function update(Request $request, $id)
+    public function decrement_card_quantity($id)
     {
+
        return response()->json(Card::where('id', '=', $id)->decrement('card_quantity'));
     }
 

@@ -47,8 +47,7 @@ class DeckController extends Controller
      */
     public function show($id)
     {
-
-        return response()->json(Deck::find($id)->cards);
+        return response()->json(Deck::with('cards')->find($id));
     }
 
     /**
@@ -64,13 +63,19 @@ class DeckController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * For update isCompleted's deck field
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param $id
+     *
      */
-    public function destroy($id)
+    public function update_completed_state(Request $request, $id)
     {
-        //
+
+        $data = $request->validate([
+            'is_complete' => 'required|boolean',
+        ]);
+
+        return response()->json(Deck::where('id', '=', $id)->update(['is_complete' => $data['is_complete']]));
     }
 }

@@ -18,6 +18,7 @@ class CreateCardsTable extends Migration
             $table->foreignId('deck_id')->constrained();
             $table->string('card_name');
             $table->string('card_picture');
+            $table->boolean('is_locked')->default(false);
             $table->integer('card_quantity')->default(1);
             $table->timestamps();
         });

@@ -11,7 +11,7 @@
           <router-link :to="'/add/'+id" class="edit_deck">
             Modifier ce deck
           </router-link>
-          <ul class="addedCard" v-for="(deckCard, index) in getDeckCards.data" :key="index">
+          <ul class="addedCard" v-for="(deckCard, index) in getDeckCards" :key="index">
             <li><b>x{{ deckCard.card_quantity }}</b><span>{{ deckCard.card_name }}</span></li>
           </ul>
         </section>

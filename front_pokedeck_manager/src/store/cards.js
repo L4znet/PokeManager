@@ -8,7 +8,7 @@ const cards = {
     state(){
         return {
             cardsToDisplay: {},
-            allCards:{},
+            allCards: {},
             results: {},
             isSearching: false,
             baseUrl: 'http://api-partiel.test',
@@ -37,7 +37,7 @@ const cards = {
                 "Rare Ultra",
                 "Uncommon"
             ],
-            types:[
+            types: [
                 "Colorless",
                 "Darkness",
                 "Dragon",
@@ -51,12 +51,14 @@ const cards = {
                 "Water"
             ],
             selectedCards: [],
-            paginationButtonLocked: {'left':{locked:true}, 'right':{locked:false}},
-            pageNumber:0,
-            totalCards:0,
-            deckCards:{},
-            quantity:0,
-            loadingState:false
+            paginationButtonLocked: {'left': {locked: true}, 'right': {locked: false}},
+            pageNumber: 0,
+            totalCards: 0,
+            deckCards: {},
+            quantity: 0,
+            loadingState: false,
+            deckCompletedList: [],
+            currentDeckInfo:{}
         }
     },
 
@@ -106,6 +108,12 @@ const cards = {
         },
         getLoadingState(state){
             return state.loadingState
+        },
+        getDeckCompletedList(state){
+            return state.deckCompletedList
+        },
+        getCurrentDeckInfo(state){
+            return state.currentDeckInfo
         }
     },
     mutations:{
@@ -144,6 +152,12 @@ const cards = {
         },
         UPDATE_LOADING_STATE(state, payload){
             state.loadingState = payload
+        },
+        UPDATE_DECK_COMPLETED_LIST(state, payload){
+            state.deckCompletedList = payload
+        },
+        UPDATE_CURRENT_DECK_INFO(state, payload){
+            state.currentDeckInfo = payload
         }
     },
 
@@ -326,22 +340,18 @@ const cards = {
 
         async addToDeck(context, payload){
 
+            let deckId = router.currentRoute._value.params.id
+
+            console.log(payload)
+
             if(payload.addPage) { // Si true on est sur la page de création / modification
-
-                console.log(context.getters.getSelectedCards)
-
-
                 if(context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId)).length !== 0){
                     let cardClicked = context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId))[0]
                     let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
                     context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
 
                     if(card.supertype !== "Energy"){
-
-                        console.log(context.getters.getSelectedCards)
-
                         if(cardClicked.quantity < 4) {
-                            context.commit('UPDATE_TOTAL_CARDS', context.state.totalCards + 1)
                             card.cardLocked = false
                             card.cardSelected = true
 
@@ -352,7 +362,7 @@ const cards = {
                                     'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                                 }
 
-                                const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity:cardClicked.quantity, deck_id:router.currentRoute._value.params.id}
+                                const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity:cardClicked.quantity, deck_id:deckId}
 
                                 await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
                             }
@@ -365,7 +375,7 @@ const cards = {
                             'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                         }
 
-                        const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity:cardClicked.quantity, deck_id:router.currentRoute._value.params.id}
+                        const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture, card_quantity:cardClicked.quantity, deck_id:deckId}
 
                         await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
 
@@ -373,7 +383,6 @@ const cards = {
                 } else {
 
                     let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
-                    context.commit('UPDATE_TOTAL_CARDS', context.state.totalCards + 1)
 
                     card.cardSelected = true
 
@@ -382,21 +391,48 @@ const cards = {
                     context.state.selectedCards.push({cardId:payload.cardId, cardName:payload.cardName, quantity: 1})
                     context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
 
-                const header = {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                }
+                    const header = {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                    }
 
-                const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture,card_quantity:1, deck_id:router.currentRoute._value.params.id}
+                    const data = {id:payload.cardId, card_name:payload.cardName, card_picture:payload.cardPicture,card_quantity:1, deck_id:deckId}
 
 
-                await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
+                    await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
                 }
             }
-
             context.dispatch('loadCardsToDeck')
         },
 
+
+       async checkIfDeckCompleted(context, payload){
+           let deckId = router.currentRoute._value.params.id
+
+           let numberTotalCards = context.getters.getDeckCards.reduce(function (iteratorValue, currentValue) {
+               return iteratorValue + currentValue.card_quantity;
+           }, 0);
+
+
+           if(context.getters.getCurrentDeckInfo.is_complete === 0){
+               if(numberTotalCards === 60){
+                   context.commit('UPDATE_TOTAL_CARDS', 60)
+
+                   context.getters.getDeckCompletedList[deckId] = {id:deckId, completed:true}
+                   context.commit('UPDATE_DECK_COMPLETED_LIST', context.getters.getDeckCompletedList)
+                   const header = {
+                       'Access-Control-Allow-Origin': '*',
+                       'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                   }
+                   context.commit('UPDATE_TOTAL_CARDS', 0)
+                   await axios.patch(context.state.baseUrl + '/pokemanager/deck/'+ deckId +'/completed', {is_complete:true}, header)
+               } else {
+                   context.dispatch('addToDeck', payload)
+               }
+           }
+
+
+        },
 
         /**
          * Action qui va diviser toutes les cartes chargé en petit groupe et va les envoyer vers le front
@@ -424,12 +460,29 @@ const cards = {
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
             }
 
-            let cardToDisplay = await axios.get(context.state.baseUrl + '/pokemanager/deck/' + router.currentRoute._value.params.id, header)
+            let currentDeck = await axios.get(context.state.baseUrl + '/pokemanager/deck/' + router.currentRoute._value.params.id, header)
 
-            context.commit('UPDATE_DECK_CARDS', cardToDisplay);
+            context.commit('UPDATE_CURRENT_DECK_INFO', currentDeck.data);
+            context.commit('UPDATE_DECK_CARDS', currentDeck.data.cards);
+
         },
 
         async deleteCardFromDeck(context, payload){
+
+            let deckId = router.currentRoute._value.params.id
+
+            context.getters.getDeckCompletedList[deckId] = {id:deckId, completed:false}
+            context.commit('UPDATE_DECK_COMPLETED_LIST', context.getters.getDeckCompletedList)
+
+            if(context.getters.getCurrentDeckInfo.is_complete === 1){
+                const header = {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                }
+
+                await axios.patch(context.state.baseUrl + '/pokemanager/deck/'+ deckId +'/completed', {is_complete:false}, header)
+            }
+
 
             // On défini un état de chargement pour brider et empêcher le spam, tant que le loading state n'est pas repassé à false on empêche le clique
             if(!context.getters.getLoadingState){
@@ -437,7 +490,7 @@ const cards = {
                 // Au clique on active le changement de state
                 context.commit('UPDATE_LOADING_STATE', true)
 
-                let card = context.getters.getDeckCards.data.filter(({ id }) => id.includes(payload))[0]
+                let card = context.getters.getDeckCards.filter(({ id }) => id.includes(payload))[0]
                 card.card_quantity--
 
                 context.commit('UPDATE_DECK_CARDS',context.getters.getDeckCards)
@@ -450,7 +503,7 @@ const cards = {
                         'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                     }
 
-                    let response = await axios.put(context.state.baseUrl + '/pokemanager/card/' + payload, header)
+                    let response = await axios.patch(context.state.baseUrl + '/pokemanager/card/'+ payload +'/decrement', header)
 
                     if(response.status === 200 || response.status === 500 || response.status === 428){
                         context.commit('UPDATE_LOADING_STATE', false)
@@ -473,12 +526,8 @@ const cards = {
                         context.dispatch('loadCardsToDeck')
                     }
                 }
-
-
             }
-
-
-        }
+        },
     },
 
 }

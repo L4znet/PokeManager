@@ -16,7 +16,10 @@ use App\Http\Controllers\CardController;
 |
 */
 
-Route::resource('deck', DeckController::class);
-Route::resource('card', CardController::class);
+Route::patch('/deck/{deck}/completed', [DeckController::class, 'update_completed_state']);
+Route::apiResource('deck', DeckController::class);
+
+Route::patch('/card/{card}/decrement', [CardController::class, 'decrement_card_quantity']);
+Route::apiResource('card', CardController::class);
 
 

@@ -3,7 +3,7 @@
 
     <section class="cards" v-if="!getSearchState">
       <pagination></pagination>
-      <card v-for="(card, index) in getCardsToDisplay" :key="index" :picture="card.images.small" :cardLocked="card.cardLocked" :cardSelected="card.cardSelected" :addPage="addPage" @click="addToDeck({cardId:card.id, cardName:card.name, cardPicture:card.images.small, addPage:addPage, superType:card.supertype})"></card>
+      <card v-for="(card, index) in getCardsToDisplay" :key="index" :picture="card.images.small" :cardLocked="card.cardLocked" :cardSelected="card.cardSelected" :addPage="addPage" @click="checkIfDeckCompleted({cardId:card.id, cardName:card.name, cardPicture:card.images.small, addPage:addPage, superType:card.supertype})"></card>
       <pagination></pagination>
     </section>
     <section class="cards" v-else>
@@ -41,7 +41,7 @@ export default {
     ...mapState("cards", ["pendingRequest"]),
   },
   methods: {
-    ...mapActions("cards", ["loadCards", "addToDeck"]),
+    ...mapActions("cards", ["loadCards", "checkIfDeckCompleted"]),
   },
 }
 </script>

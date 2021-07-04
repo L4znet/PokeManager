@@ -45,6 +45,8 @@ export default {
     justify-content: center;
     align-items: center;
     color:#FFF;
+    font-size:13px;
+    font-weight: bold;
   }
 
 

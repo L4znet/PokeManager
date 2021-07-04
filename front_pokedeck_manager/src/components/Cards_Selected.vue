@@ -1,9 +1,10 @@
 <template>
   <transition name="slide-fade">
 
+
     <section class="cards" v-if="!getSearchState">
       <pagination></pagination>
-      <card v-for="(card, index) in getDeckCards.data" :key="index" :picture="card.card_picture" :quantity="card.card_quantity"></card>
+      <card v-for="(card, index) in getDeckCards" :key="index" :picture="card.card_picture" :quantity="card.card_quantity"></card>
       <pagination></pagination>
     </section>
     <section class="cards" v-else>
