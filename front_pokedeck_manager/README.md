@@ -1,4 +1,6 @@
-# front_pokedeck_manager
+# Interface de mon projet de fin d'année
+
+Cette interface communique directement avec une API Laravel, pour communiquer j'utilise Axios.
 
 ## Project setup
 ```
