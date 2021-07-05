@@ -1,6 +1,5 @@
 import axios from 'axios'
 import router from "../router";
-//import router from '@/router'
 
 const cards = {
     namespaced: true,
@@ -172,21 +171,28 @@ const cards = {
         getAllCards(state){
             return state.allCards
         },
+
+
         getSearchResults(state){
             return state.results
         },
+        // Permet d'afficher la page des résultats quand on effectue une recherche ou quand on veut filtrer
         getSearchState(state){
             return state.isSearching
         },
+
+
         getRarities(state){
             return state.rarities
         },
         getTypes(state){
             return state.types
         },
-        getCardCountClickArray(state){
-            return state.cardCountClickArray
+        getAllSet(state){
+            return state.sets
         },
+
+        // Contient les cartes sur lesquels on a cliqué
         getSelectedCards(state){
             return state.selectedCards
         },
@@ -195,30 +201,36 @@ const cards = {
         getPaginationButtonLockedState(state){
             return state.paginationButtonLocked;
         },
+
+        // Contient le numéro de page actuel, sert à la pagination
         getPageNumber(state){
             return state.pageNumber
         },
+
+        // Contient le nombre total de cartes dans un deck (quantité inclus)
         getTotalCards(state){
             return state.totalCards
         },
+
+        // Contient les cartes d'un deck
         getDeckCards(state){
             return state.deckCards
         },
-        getQuantity(state){
-            return state.quantity
-        },
+
+        // Permet de limiter le nombre de clique en utilisant une sorte de loader
         getLoadingState(state){
             return state.loadingState
         },
+
+        // Contient les decks que l'on a marqué comme "Complet"
         getDeckCompletedList(state){
             return state.deckCompletedList
         },
+
+        // Contient les informations relative au deck ouvert sur la page
         getCurrentDeckInfo(state){
             return state.currentDeckInfo
         },
-        getAllSet(state){
-            return state.sets
-        }
     },
     mutations:{
         UPDATE_CARDS_TO_DISPLAY(state, payload){
@@ -232,9 +244,6 @@ const cards = {
         },
         UPDATE_SEARCH_STATE(state, payload){
             state.isSearching = payload
-        },
-        UPDATE_CARD_COUNT_CLICK_ARRAY(state, payload){
-            state.cardCountClickArray = payload
         },
         UPDATE_SELECTED_CARDS(state, payload){
             state.selectedCards = payload
@@ -250,9 +259,6 @@ const cards = {
         },
         UPDATE_DECK_CARDS(state, payload){
             state.deckCards = payload
-        },
-        UPDATE_QUANTITY(state, payload){
-            state.quantity = payload
         },
         UPDATE_LOADING_STATE(state, payload){
             state.loadingState = payload
@@ -343,7 +349,6 @@ const cards = {
                 if(context.getters.getPageNumber > 1){
                     context.commit('UPDATE_PAGE_NUMBER', context.getters.getPageNumber - 1);
 
-                    console.log(context.getters.getPageNumber)
                     context.dispatch('displayCardsChunk', {arraySize:23, chunkIndex:context.getters.getPageNumber})
 
                 } else {
@@ -361,19 +366,13 @@ const cards = {
          * @param payload
          */
         searchValue(context, payload){
-            console.log(payload)
             if(payload.isDeckDetail){
 
                 // On filtre avec le searchTerm
 
-
-
-
                 let results = payload.cards.filter(item => {
                     return item.card_name.includes(payload.searchTerm);
                 }, payload.searchTerm);
-
-                console.log(results)
 
                 // On active le mode recherche et on envoi les résultats dans le front
                 context.commit('UPDATE_SEARCH_STATE', true);
@@ -403,10 +402,14 @@ const cards = {
 
         },
 
+        /**
+         * Permet de reset la barre de recherche après qu'on ai effectué une recherche
+         *
+         * @param context
+         */
         resetSearch(context){
             context.commit('UPDATE_SEARCH_STATE', false)
             context.commit('UPDATE_RESULTS', '');
-
         },
 
 
@@ -426,7 +429,6 @@ const cards = {
                             context.commit('UPDATE_RESULTS', results);
                             context.commit('UPDATE_SEARCH_STATE', true);
                         } else if( payload.filterValue === "Tous"){
-                            console.log('fsdsdffsd')
                             context.commit('UPDATE_SEARCH_STATE', false);
                         }
                     }
@@ -447,7 +449,6 @@ const cards = {
                     break;
                 case "set":
                     for (let i = 0; i < context.getters.getAllCards.length; i++) {
-
                         if(context.getters.getAllCards[i].set.name === payload.filterValue){
                             results.push(context.getters.getAllCards[i])
                             context.commit('UPDATE_RESULTS', results);
@@ -464,25 +465,41 @@ const cards = {
             }
         },
 
+
+        /**
+         * Action qui gère les cartes au deck
+         *
+         * @param context
+         * @param payload
+         * @returns {Promise<void>}
+         */
         async addToDeck(context, payload){
 
+            // On récupère l'Id du deck courant
             let deckId = router.currentRoute._value.params.id
 
-            console.log('sdaaafszdfdsfsdfds', payload.addPage)
-
             if(payload.addPage) { // Si true on est sur la page de création / modification
+
+                // On regarde si la carte sur laquelle on clique est déjà présente dans le deck, si c'est le cas on modifie sa quantité, si ce n'est pas le cas on l'ajoute au deck
                 if(context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId)).length !== 0){
                     let cardClicked = context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId))[0]
                     let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
                     context.commit('UPDATE_SELECTED_CARDS', context.state.selectedCards)
 
+                    // Si la carte n'est pas une carte énergie...
                     if(card.supertype !== "Energy"){
+                        // et si la quantité de cette carte est inférieur à 4
                         if(cardClicked.quantity < 4) {
+                            // On change son statut
                             card.cardLocked = false
                             card.cardSelected = true
 
+                            // Si la carte sur laquelle on clique n'est pas bloqué
                             if (!card.cardLocked) {
+                                // On modifie sa quantité, jusqu'à ce qu'on ne puisse plus
                                 cardClicked.quantity++
+
+                                // et on l'envoi en base de données
                                 const header = {
                                     'Access-Control-Allow-Origin': '*',
                                     'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -493,7 +510,16 @@ const cards = {
                                 await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
                             }
                         }
+
+                        // Si la quantité de la carte atteint 4, on bloque la carte "et on update
+                        if(cardClicked.quantity === 4){
+                            card.cardLocked = true
+                            card.cardSelected = false
+                            context.commit('UPDATE_CARDS_TO_DISPLAY', context.state.cardsToDisplay)
+                        }
                     } else {
+                        // Si la carte est une carte énergie, on incrémente la quantité, jusqu'à ce qu'on ait atteint la limite du nombre de cartes par deck
+
                         cardClicked.quantity++
 
                         const header = {
@@ -506,7 +532,7 @@ const cards = {
                         await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
 
                     }
-                } else {
+                } else { // Si la carte n'est pas déjà présente dans le deck, on l'ajoute
 
                     let card = context.state.cardsToDisplay.filter(({ id }) => id.includes(payload.cardId))[0]
 
@@ -528,32 +554,53 @@ const cards = {
                     await axios.post(context.state.baseUrl + '/pokemanager/card', data,header)
                 }
             }
+            // Et on demande au code de charger les cartes du deck, pour mettre à jour à chaque ajout / modification
             context.dispatch('loadCardsToDeck')
         },
 
 
+        /**
+         * Action qui vérifie le nombre de cartes totale présente dans un deck, elle se place avant l'action "AddToDeck" en tant que vérificateur
+         *
+         * @param context
+         * @param payload
+         * @returns {Promise<void>}
+         */
        async checkIfDeckCompleted(context, payload){
+
+           // On récupère l'id du deck courant
            let deckId = router.currentRoute._value.params.id
 
+
+            // On fais la somme des cartes en utilisant leurs quantités
            let numberTotalCards = context.getters.getDeckCards.reduce(function (iteratorValue, currentValue) {
                return iteratorValue + currentValue.card_quantity;
            }, 0);
 
-
+            // Si le deck courant n'est pas "complet"
            if(context.getters.getCurrentDeckInfo.is_complete === 0){
+
+               // Si le nombre total de cartes est égal à 59
                if(numberTotalCards === 59){
+                   // On l'update à 60 (décallage entre le clique et le nombre)
                    context.commit('UPDATE_TOTAL_CARDS', 60)
 
+                   // On l'ajoute à la liste des decks complets
                    context.getters.getDeckCompletedList[deckId] = {id:deckId, completed:true}
                    context.commit('UPDATE_DECK_COMPLETED_LIST', context.getters.getDeckCompletedList)
                    const header = {
                        'Access-Control-Allow-Origin': '*',
                        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                    }
+                   // On passe son nombre total de cartes à zéro car on lui a asigné son état en base de données, il n'est donc plus nécessaire de l'avoir ici
                    context.commit('UPDATE_TOTAL_CARDS', 0)
                    await axios.patch(context.state.baseUrl + '/pokemanager/deck/'+ deckId +'/completed', {is_complete:true}, header)
+
+
+                   // On ajoute la carte au deck,
                   await  context.dispatch('addToDeck', payload)
                } else {
+                   // Tant que la quantité n'est pas égal à 59 on ajoute au deck
                    await context.dispatch('addToDeck', payload)
                }
            }

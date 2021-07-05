@@ -40,18 +40,6 @@ class CardController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-
-    /**
      * For decrement the specified card's quantity
      *
      * @param $id

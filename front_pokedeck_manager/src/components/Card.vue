@@ -1,8 +1,10 @@
 <template>
   <article class="card" :class="{ card__add_page: addPage, highlight_card:cardSelected, lock_card:cardLocked, }">
     <div class="card_quantity" v-if="quantity > 1">{{quantity}}</div>
+    <div class="card_quantity" v-if="quantity > 1">{{quantity}}</div>
     <img :src="picture">
   </article>
+
 </template>
 
 

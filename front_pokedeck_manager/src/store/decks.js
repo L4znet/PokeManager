@@ -17,7 +17,6 @@ const decks = {
                 addingMode:false
             },
             selectedCards: [],
-            totalCards:0,
             cardsToDisplay: {},
 
         }
@@ -41,9 +40,6 @@ const decks = {
         },
         getModes(state){
             return state.modes
-        },
-        getSelectedCards(state){
-            return state.selectedCards
         },
         // Sert à get toutes les cartes chargé sur la page
         getCardsToDisplay(state){
@@ -73,9 +69,6 @@ const decks = {
         UPDATE_MODES_STATE(state, payload){
             state.modes = payload
         },
-        UPDATE_SELECTED_CARDS(state, payload){
-            state.selectedCards = payload
-        },
 
     },
 
@@ -87,6 +80,13 @@ const decks = {
             }
         },
 
+
+        /**
+         * Action qui se lancer quand on clique sur un emoji
+         *
+         * @param context
+         * @param payload
+         */
         selectEmoji(context, payload){
             // On s'assure d'avoir un code structuré comme on le souhaite, et d'en avoir qu'un seul
             if(payload.length > 5){
@@ -95,7 +95,7 @@ const decks = {
             context.commit('UPDATE_LIST_EMOJI_STATE', false);
             context.commit('UPDATE_SELECTED_EMOJI', payload);
 
-
+            // Si on est en train de modifier un deck, on lance l'action approprié
             if(context.getters.getModes.editingMode){
                 context.dispatch('editDeckEmoji', payload)
             } else {
@@ -107,14 +107,23 @@ const decks = {
 
         },
 
-
-
-
+        /**
+         * Action qui affiche la liste des emoji
+         *
+         * @param context
+         */
         toggleListEmoji(context){
             context.commit('UPDATE_LIST_EMOJI_STATE', true);
         },
 
+        /**
+         * Action qui permet d'ajouter un deck
+         *
+         * @param context
+         * @returns {Promise<void>}
+         */
         async addDeck(context){
+
             if(context.getters.getSelectedEmoji !== "" && context.getters.getDeckName !== ""){
                 const data = {
                     'deck_name':context.getters.getDeckName,
@@ -126,8 +135,7 @@ const decks = {
                     'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                 }
 
-              const response =   await axios.post(context.state.baseUrl + '/pokemanager/deck', data,header)
-                console.log(response)
+              const response = await axios.post(context.state.baseUrl + '/pokemanager/deck', data,header)
 
              if(response.status === 200){
                  await router.replace('/add/' + response.data.id)
@@ -138,10 +146,15 @@ const decks = {
             }
         },
 
-
+        /**
+         * Action qui permet de modifier le nom d'un deck
+         *
+         * @param context
+         * @param payload
+         * @returns {Promise<void>}
+         */
         async editDeckName(context, payload){
             if(payload !== ""){
-
                 let id = router.currentRoute._value.params.id
                 const header = {
                     'Access-Control-Allow-Origin': '*',
@@ -159,6 +172,14 @@ const decks = {
             }
         },
 
+
+        /**
+         * Action qui permet de modifier l'emoji d'un deck
+         *
+         * @param context
+         * @param payload
+         * @returns {Promise<void>}
+         */
         async editDeckEmoji(context, payload){
             if(payload !== ""){
                 let id = router.currentRoute._value.params.id
@@ -179,23 +200,34 @@ const decks = {
         },
 
 
+        /**
+         * Action qui permet de récupérer tous les decks
+         *
+         * @param context
+         * @returns {Promise<void>}
+         */
         async getAllDecks(context){
             const decks = await axios.get(context.state.baseUrl + '/pokemanager/deck')
             context.commit('UPDATE_DECKS', decks.data);
-            console.log(decks)
         },
+
+
         switchToEditMode(context){
             context.commit('UPDATE_MODES_STATE', {
                 editingMode:true,
                 addingMode:false
             })
         },
+
+
         switchToAddingMode(context){
             context.commit('UPDATE_MODES_STATE', {
                 editingMode:false,
                 addingMode:true
             })
         },
+
+
         resetModes(context){
             context.commit('UPDATE_MODES_STATE', {
                 editingMode:false,
