@@ -17,7 +17,8 @@ use App\Http\Controllers\CardController;
 */
 
 Route::patch('/deck/{deck}/completed', [DeckController::class, 'update_completed_state']);
-Route::patch('/deck/{deck}/update', [DeckController::class, 'update_deck_value']);
+Route::patch('/deck/{deck}/update/name', [DeckController::class, 'update_deck_name']);
+Route::patch('/deck/{deck}/update/emoji', [DeckController::class, 'update_deck_emoji']);
 Route::apiResource('deck', DeckController::class);
 
 Route::patch('/card/{card}/decrement', [CardController::class, 'decrement_card_quantity']);

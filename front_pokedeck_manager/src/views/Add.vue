@@ -1,6 +1,6 @@
 <template>
   <section class="addecks">
-    <section v-if="getModes.addingMode">
+    <section v-if="getModes.editingMode">
       <section class="side">
         <searchbar></searchbar>
         <cards :addPage="true"></cards>
@@ -10,7 +10,7 @@
           Retourner au deck
         </router-link>
         <div class="editDeck">
-          <input type="text" v-model="getCurrentDeckInfo.deck_name" @change="changeAndReset(getCurrentDeckInfo.deck_name)" placeholder="Choisissez un nom pour votre nouveau deck">
+          <input type="text" v-model="getCurrentDeckInfo.deck_name" @change="editDeckName(getCurrentDeckInfo.deck_name)" placeholder="Choisissez un nom pour votre nouveau deck">
           <emojiselector :emojiCode="getCurrentDeckInfo.deck_emoji"></emojiselector>
 
         </div>
@@ -80,7 +80,7 @@ export default {
     ...mapGetters("cards", ["getSelectedCards", "getDeckCards", "getCurrentDeckInfo"]),
   },
   methods:{
-    ...mapActions("decks", ["addDeckName", "switchToEdit"]),
+    ...mapActions("decks", ["addDeckName", "switchToEdit", "editDeckName", "editDeckEmoji"]),
     ...mapActions("cards", ["loadSelectedCard", "deleteCardFromDeck"]),
 
   },

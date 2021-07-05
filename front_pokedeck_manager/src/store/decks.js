@@ -95,11 +95,21 @@ const decks = {
             context.commit('UPDATE_LIST_EMOJI_STATE', false);
             context.commit('UPDATE_SELECTED_EMOJI', payload);
 
-            if(context.getters.getDeckName !== ""){
-                context.dispatch('addDeck')
-                router.push('/mydecks')
+
+            if(context.getters.getModes.editingMode){
+                context.dispatch('editDeckEmoji', payload)
+            } else {
+                if(context.getters.getDeckName !== ""){
+                    context.dispatch('addDeck')
+                    router.push('/mydecks')
+                }
             }
+
         },
+
+
+
+
         toggleListEmoji(context){
             context.commit('UPDATE_LIST_EMOJI_STATE', true);
         },
@@ -121,26 +131,58 @@ const decks = {
 
              if(response.status === 200){
                  await router.replace('/add/' + response.data.id)
-                 context.commit('UPDATE_MODES_STATE', { editingMode:false, addingMode:true});
+                 context.commit('UPDATE_MODES_STATE', { editingMode:true, addingMode:false});
              }
             } else {
               // On lance une erreur
             }
         },
 
+
+        async editDeckName(context, payload){
+            if(payload !== ""){
+
+                let id = router.currentRoute._value.params.id
+                const header = {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                }
+
+                const response =   await axios.patch(context.state.baseUrl + '/pokemanager/deck/'+ id +'/update/name', {'deck_name':payload},header)
+
+                if(response.status === 200){
+                    await router.replace('/add/' + id)
+                    context.commit('UPDATE_MODES_STATE', { editingMode:true, addingMode:false});
+                }
+            } else {
+                // On lance une erreur
+            }
+        },
+
+        async editDeckEmoji(context, payload){
+            if(payload !== ""){
+                let id = router.currentRoute._value.params.id
+                const header = {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                }
+
+                const response =   await axios.patch(context.state.baseUrl + '/pokemanager/deck/'+ id +'/update/emoji', {'deck_emoji':payload},header)
+
+                if(response.status === 200){
+                    await router.replace('/add/' + id)
+                    context.commit('UPDATE_MODES_STATE', { editingMode:true, addingMode:false});
+                }
+            } else {
+                // On lance une erreur
+            }
+        },
+
+
         async getAllDecks(context){
             const decks = await axios.get(context.state.baseUrl + '/pokemanager/deck')
             context.commit('UPDATE_DECKS', decks.data);
-
-
             console.log(decks)
-        },
-        switchToEdit(context){
-            if(router.currentRoute._value.params.id === undefined){
-                context.commit('UPDATE_EDIT_DECK_STATE', false);
-            } else {
-                context.commit('UPDATE_EDIT_DECK_STATE', true);
-            }
         },
         switchToEditMode(context){
             context.commit('UPDATE_MODES_STATE', {
@@ -155,8 +197,6 @@ const decks = {
             })
         },
         resetModes(context){
-            console.log('dfssdffsd')
-
             context.commit('UPDATE_MODES_STATE', {
                 editingMode:false,
                 addingMode:false

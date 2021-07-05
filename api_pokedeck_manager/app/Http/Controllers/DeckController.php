@@ -80,12 +80,19 @@ class DeckController extends Controller
         return response()->json(Deck::where('id', '=', $id)->update(['is_complete' => $data['is_complete']]));
     }
 
-    public function update_deck_value(Request $request, $id){
+    public function update_deck_emoji(Request $request, $id){
         $data = $request->validate([
-            'deck_name' => 'required',
             'deck_emoji' => 'required',
         ]);
 
-        return response()->json(Deck::where('id', '=', $id)->update(['deck_name' => $data['deck_name'], 'deck_emoji' => $data['deck_emoji']]));
+        return response()->json(Deck::where('id', '=', $id)->update(['deck_emoji' => $data['deck_emoji']]));
+    }
+
+    public function update_deck_name(Request $request, $id){
+        $data = $request->validate([
+            'deck_name' => 'required',
+        ]);
+
+        return response()->json(Deck::where('id', '=', $id)->update(['deck_name' => $data['deck_name']]));
     }
 }

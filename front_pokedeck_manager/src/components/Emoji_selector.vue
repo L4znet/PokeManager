@@ -1,6 +1,11 @@
 <template>
 <div class="emoji_selector">
-  <div class="emoji_picker" @click="loadEmojiList">{{getSelectedEmoji ? String.fromCodePoint('0x' + getSelectedEmoji): '+'}}<span></span></div>
+  {{test}}
+  <!-- Si on modifie un deck !-->
+  <div class="emoji_picker" v-if="getModes.editingMode" @click="loadEmojiList">{{getSelectedEmoji ? String.fromCodePoint('0x' + getSelectedEmoji): '+'}}<span></span></div>
+
+  <!-- Le sélecteur d'emoji par défaut !-->
+  <div class="emoji_picker" v-else @click="loadEmojiList">{{getSelectedEmoji ? String.fromCodePoint('0x' + getSelectedEmoji): '+'}}<span></span></div>
 
   <transition name="fade" mode="out-in">
     <div class="emoji_picker_list" v-if="getListEmojiState">
@@ -25,21 +30,24 @@ export default {
   },
   data(){
     return{
-      emojiList:[]
+      emojiList:[],
+      test:null
     }
   },
   props:{
     emojiCode:String
   },
+  watch:{
+    deck_emoji: function () {
+      this.test =  this.getCurrentDeckInfo.deck_emoji
+    },
+  },
   computed:{
     ...mapGetters("decks", ["getListEmojiState", "getSelectedEmoji", "getModes"]),
+    ...mapGetters("cards", ["getCurrentDeckInfo"]),
   },
   methods: {
-    ...mapActions("decks", ["selectEmoji"]),
-    ...mapActions({
-      toggleListEmoji: 'decks/toggleListEmoji',
-      selectEmoji: 'decks/selectEmoji'
-    }),
+    ...mapActions("decks", ["selectEmoji", "toggleListEmoji", "editEmoji"]),
 
     loadEmojiList(){
       this.toggleListEmoji()
