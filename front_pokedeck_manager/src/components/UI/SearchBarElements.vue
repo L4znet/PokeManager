@@ -1,11 +1,8 @@
 <template>
   <form action="" v-if="isDeckDetail">
-    <input type="search" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getDeckCards.data, isDeckDetail:true})" placeholder="Recherchez une carte...">
+    <input type="search" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getDeckCards, isDeckDetail:true})" placeholder="Recherchez une carte...">
   </form>
-
-
   <form action="" v-else>
-
     <input type="search" v-model="searchTerm" @input="searchValue({searchTerm:searchTerm, cards:getAllCards, isDeckDetail:false})" placeholder="Recherchez une carte...">
   </form>
 </template>

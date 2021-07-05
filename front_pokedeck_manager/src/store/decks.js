@@ -39,9 +39,6 @@ const decks = {
         getDecks(state){
             return state.decks
         },
-        getEditDeckState(state){
-            return state.editingDeck
-        },
         getModes(state){
             return state.modes
         },
@@ -83,7 +80,7 @@ const decks = {
     },
 
     actions:{
-        changeDeckName(context, payload){
+        addDeckName(context, payload){
             context.commit('UPDATE_DECK_NAME', payload);
             if(context.getters.getSelectedEmoji !== ""){
                 context.dispatch('addDeck')
@@ -100,6 +97,7 @@ const decks = {
 
             if(context.getters.getDeckName !== ""){
                 context.dispatch('addDeck')
+                router.push('/mydecks')
             }
         },
         toggleListEmoji(context){
@@ -123,14 +121,12 @@ const decks = {
 
              if(response.status === 200){
                  await router.replace('/add/' + response.data.id)
-                 context.commit('UPDATE_EDIT_DECK_STATE', true);
-                 context.dispatch('switchToAddingMode')
+                 context.commit('UPDATE_MODES_STATE', { editingMode:false, addingMode:true});
              }
             } else {
               // On lance une erreur
             }
         },
-
 
         async getAllDecks(context){
             const decks = await axios.get(context.state.baseUrl + '/pokemanager/deck')
@@ -159,6 +155,8 @@ const decks = {
             })
         },
         resetModes(context){
+            console.log('dfssdffsd')
+
             context.commit('UPDATE_MODES_STATE', {
                 editingMode:false,
                 addingMode:false

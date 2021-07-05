@@ -62,6 +62,7 @@ export default {
   display: flex;
   justify-content: center;
   font-size:30px;
+  margin:20px 0;
 }
 
 

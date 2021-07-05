@@ -361,9 +361,14 @@ const cards = {
          * @param payload
          */
         searchValue(context, payload){
+            console.log(payload)
             if(payload.isDeckDetail){
 
                 // On filtre avec le searchTerm
+
+
+
+
                 let results = payload.cards.filter(item => {
                     return item.card_name.includes(payload.searchTerm);
                 }, payload.searchTerm);
@@ -397,6 +402,13 @@ const cards = {
 
 
         },
+
+        resetSearch(context){
+            context.commit('UPDATE_SEARCH_STATE', false)
+            context.commit('UPDATE_RESULTS', '');
+
+        },
+
 
         /**
          * Action qui gère les filtres
@@ -456,7 +468,7 @@ const cards = {
 
             let deckId = router.currentRoute._value.params.id
 
-            console.log(payload)
+            console.log('sdaaafszdfdsfsdfds', payload.addPage)
 
             if(payload.addPage) { // Si true on est sur la page de création / modification
                 if(context.getters.getSelectedCards.filter(({ cardId }) => cardId.includes(payload.cardId)).length !== 0){
@@ -643,6 +655,9 @@ const cards = {
                 }
             }
         },
+
+
+
     },
 
 }

@@ -8,7 +8,7 @@
         </section>
         <section class="side"  v-if="deckCardsLength !== 0">
 
-          <router-link :to="'/add/'+id" class="edit_deck">
+          <router-link :to="'/add/'+id" class="edit_deck" @click="switchToEditMode">
             Modifier ce deck
           </router-link>
           <ul class="addedCard" v-for="(deckCard, index) in getDeckCards" :key="index">
@@ -62,11 +62,12 @@ export default {
 
 
   computed:{
-    ...mapGetters("decks", ["getEditDeckState", "getDecks"]),
+    ...mapGetters("decks", ["getEditDeckState", "getDecks", "getModes"]),
     ...mapGetters("cards", ["getDeckCards"]),
   },
   methods:{
-    ...mapActions("cards", ["loadCardsToDeck"])
+    ...mapActions("cards", ["loadCardsToDeck"]),
+    ...mapActions("decks", ["switchToEditMode"])
   },
 }
 </script>

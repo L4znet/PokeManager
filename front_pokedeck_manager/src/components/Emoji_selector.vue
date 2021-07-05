@@ -28,8 +28,11 @@ export default {
       emojiList:[]
     }
   },
+  props:{
+    emojiCode:String
+  },
   computed:{
-    ...mapGetters("decks", ["getListEmojiState", "getSelectedEmoji"]),
+    ...mapGetters("decks", ["getListEmojiState", "getSelectedEmoji", "getModes"]),
   },
   methods: {
     ...mapActions("decks", ["selectEmoji"]),

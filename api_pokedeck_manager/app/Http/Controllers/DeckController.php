@@ -34,9 +34,10 @@ class DeckController extends Controller
             'deck_emoji' => 'required'
         ]);
 
-        return response()->json(Deck::updateOrCreate(
-            ['deck_name' => $data['deck_name']],
-            ['deck_name' => $data['deck_name'], 'deck_emoji' => $data['deck_emoji']]));
+        return response()->json(Deck::create([
+            'deck_name' => $data['deck_name'],
+            'deck_emoji' => $data['deck_emoji']
+        ]));
     }
 
     /**
@@ -77,5 +78,14 @@ class DeckController extends Controller
         ]);
 
         return response()->json(Deck::where('id', '=', $id)->update(['is_complete' => $data['is_complete']]));
+    }
+
+    public function update_deck_value(Request $request, $id){
+        $data = $request->validate([
+            'deck_name' => 'required',
+            'deck_emoji' => 'required',
+        ]);
+
+        return response()->json(Deck::where('id', '=', $id)->update(['deck_name' => $data['deck_name'], 'deck_emoji' => $data['deck_emoji']]));
     }
 }

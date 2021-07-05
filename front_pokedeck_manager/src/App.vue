@@ -2,7 +2,7 @@
   <div id="nav">
     <router-link to="/"><i class="fas fa-home"></i></router-link>
     <router-link to="/mydecks"><i class="fas fa-window-restore"></i></router-link>
-    <router-link to="/add"><i class="far fa-plus-square"></i></router-link>
+    <router-link to="/add" @click="resetModes"><i class="far fa-plus-square"></i></router-link>
   </div>
   <router-view v-slot="{ Component }">
     <transition name="fade" mode="out-in">
@@ -10,6 +10,18 @@
     </transition>
   </router-view>
 </template>
+
+<script>
+import {mapActions} from "vuex";
+
+export default {
+  name: 'App',
+  methods:{
+    ...mapActions("decks", ["resetModes"])
+  },
+}
+
+</script>
 
 <style>
 

@@ -8,7 +8,7 @@
     </section>
     <section class="cards" v-else>
       <h2>{{ getSearchResults.length }} résultats pour votre recherche</h2>
-      <card v-for="(card, index) in getSearchResults" :key="index" :picture="card.images.small" @click="addToDeck({cardName:card.name, addPage:addPage})"></card>
+      <card v-for="(card, index) in getSearchResults" :key="index" :picture="card.images.small" @click="checkIfDeckCompleted({cardId:card.id, cardName:card.name, cardPicture:card.images.small, addPage:addPage, superType:card.supertype})"></card>
     </section>
   </transition>
 

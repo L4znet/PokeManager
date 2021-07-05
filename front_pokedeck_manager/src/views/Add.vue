@@ -1,15 +1,19 @@
 <template>
   <section class="addecks">
-    <section v-if="getEditDeckState">
+    <section v-if="getModes.addingMode">
       <section class="side">
         <searchbar></searchbar>
         <cards :addPage="true"></cards>
       </section>
       <section class="side" v-if="length !== 0">
-
         <router-link :to="'/deck/'+id" class="edit_deck">
           Retourner au deck
         </router-link>
+        <div class="editDeck">
+          <input type="text" v-model="getCurrentDeckInfo.deck_name" @change="changeAndReset(getCurrentDeckInfo.deck_name)" placeholder="Choisissez un nom pour votre nouveau deck">
+          <emojiselector :emojiCode="getCurrentDeckInfo.deck_emoji"></emojiselector>
+
+        </div>
 
         <ul class="addedCard" v-for="(deckCard, index) in getDeckCards" :key="index">
           <li class="decremente" v-if="deckCard.card_quantity > 1" @click="deleteCardFromDeck(deckCard.id)"><b>x{{ deckCard.card_quantity }}</b><span>{{ deckCard.card_name }}</span></li>
@@ -23,7 +27,10 @@
     </section>
     <section class="selectedDecks" v-else>
       <div class="addNewDeck">
-        <input type="text" v-model="deckName" @change="changeDeckName(deckName)" placeholder="Choisissez un nom pour votre nouveau deck">
+
+
+        <input type="text" v-model="deckName" @change="addDeckName(deckName)" placeholder="Choisissez un nom pour votre nouveau deck">
+
         <emojiselector></emojiselector>
       </div>
 
@@ -45,7 +52,8 @@ export default {
     return {
       cardAdded:true,
       id:router.currentRoute._value.params.id,
-      length: null
+      length: null,
+      deckName:''
     }
   },
 
@@ -55,6 +63,9 @@ export default {
   watch: {
     getDecks() {
       this.length = this.getDecks.data.length
+    },
+    resetDeckName(){
+      this.deckName = ""
     }
   },
   components: {
@@ -65,12 +76,13 @@ export default {
   },
 
   computed:{
-    ...mapGetters("decks", ["getEditDeckState", "getDecks"]),
-    ...mapGetters("cards", ["getSelectedCards", "getDeckCards"]),
+    ...mapGetters("decks", ["getModes", "getDecks"]),
+    ...mapGetters("cards", ["getSelectedCards", "getDeckCards", "getCurrentDeckInfo"]),
   },
   methods:{
-    ...mapActions("decks", ["changeDeckName", "switchToEdit"]),
-    ...mapActions("cards", ["loadSelectedCard", "deleteCardFromDeck"])
+    ...mapActions("decks", ["addDeckName", "switchToEdit"]),
+    ...mapActions("cards", ["loadSelectedCard", "deleteCardFromDeck"]),
+
   },
 }
 </script>

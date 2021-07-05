@@ -2,7 +2,7 @@
   <section class="searchbar">
     <search-bar-elements :isDeckDetail="isDeckDetail"></search-bar-elements>
 
-    <filters></filters>
+    <filters v-if="!isDeckDetail"></filters>
   </section>
 </template>
 
